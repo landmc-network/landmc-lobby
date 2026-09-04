@@ -1,7 +1,14 @@
 package pl.landmc.lobby;
 
+import org.bukkit.block.Biome;
+import org.bukkit.generator.BiomeProvider;
+import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import pl.landmc.lobby.bootstrap.LobbyBootstrap;
+import pl.landmc.lobby.world.VoidBiomeProvider;
+import pl.landmc.lobby.world.VoidChunkGenerator;
 
 /**
  * The Paper entry point for the LandMC lobby.
@@ -21,6 +28,30 @@ public final class LandLobbyPlugin extends JavaPlugin {
     public void onEnable() {
         this.bootstrap = new LobbyBootstrap(this, this.getSLF4JLogger(), this.getDataPath());
         this.bootstrap.start();
+    }
+
+    /**
+     * The empty-world generator, selected per world in {@code bukkit.yml}:
+     *
+     * <pre>
+     * worlds:
+     *   world:
+     *     generator: landmc-lobby
+     * </pre>
+     *
+     * <p>Paper asks for this while the world is being created, which is before {@code onEnable}
+     * runs - so it must not depend on anything the bootstrap builds.
+     */
+    @Override
+    public @NotNull ChunkGenerator getDefaultWorldGenerator(
+            @NotNull String worldName, @Nullable String id) {
+        return new VoidChunkGenerator(new VoidBiomeProvider(Biome.THE_VOID));
+    }
+
+    @Override
+    public @NotNull BiomeProvider getDefaultBiomeProvider(
+            @NotNull String worldName, @Nullable String id) {
+        return new VoidBiomeProvider(Biome.THE_VOID);
     }
 
     @Override

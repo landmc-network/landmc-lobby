@@ -3,6 +3,14 @@ version: '${version}'
 main: pl.landmc.lobby.LandLobbyPlugin
 api-version: '26.2'
 description: Lobby sieci LandMC - spawn, profil gracza i komunikacja z proxy.
+
+# Enabled before the worlds are loaded, because the default world's generator has to exist by
+# the time the server creates it. A plugin enabled afterwards is too late, and the server says
+# so: "Could not set generator for default world - is it load:STARTUP?".
+#
+# The cost is that nothing here may assume a world exists during onEnable, which is why the
+# world settings are applied from ServerLoadEvent instead.
+load: STARTUP
 author: Crispi
 website: https://github.com/landmc-network/landmc-lobby
 

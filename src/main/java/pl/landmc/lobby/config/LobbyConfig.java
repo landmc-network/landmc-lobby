@@ -3,6 +3,10 @@ package pl.landmc.lobby.config;
 import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.configs.annotation.Comment;
 import eu.okaeri.configs.annotation.CustomKey;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import pl.landmc.platform.database.DatabaseConfig;
 import pl.landmc.platform.messaging.redis.RedisConfig;
 
@@ -15,6 +19,9 @@ public class LobbyConfig extends OkaeriConfig {
     public LobbySection lobby = new LobbySection();
 
     public SpawnSection spawn = new SpawnSection();
+
+    @Comment("")
+    public WorldSection world = new WorldSection();
 
     @Comment("Baza danych profili lobby. H2 dziala bez zadnej konfiguracji.")
     public DatabaseConfig database = new DatabaseConfig();
@@ -52,6 +59,43 @@ public class LobbyConfig extends OkaeriConfig {
         public float yaw = 0.0f;
 
         public float pitch = 0.0f;
+    }
+
+    /**
+     * Ustawienia swiata lobby. Sam generator pustych chunkow podpina sie w bukkit.yml:
+     *
+     * <pre>
+     * worlds:
+     *   world:
+     *     generator: landmc-lobby
+     * </pre>
+     */
+    public static class WorldSection extends OkaeriConfig {
+
+        @Comment("Swiaty traktowane jako lobby: dostaja ponizsze gamerule i punkt spawnu.")
+        @Comment("Same w sobie nie staja sie przez to puste - o generatorze decyduje bukkit.yml.")
+        public List<String> worlds = new ArrayList<>(List.of("world"));
+
+        @Comment("")
+        @Comment("Punkt spawnu swiata. W pustym swiecie domyslny spawn wypada tam, gdzie nie ma")
+        @Comment("bloku, wiec gracz wchodzacy przed wklejeniem budowli spada w void.")
+        @CustomKey("set-spawn-point")
+        public boolean setSpawnPoint = true;
+
+        @CustomKey("spawn-x")
+        public double spawnX = 0.0;
+
+        @CustomKey("spawn-y")
+        public double spawnY = 100.0;
+
+        @CustomKey("spawn-z")
+        public double spawnZ = 0.0;
+
+        @Comment("")
+        @Comment("Gamerule ustawiane przy starcie. Nazwa dokladnie jak w /gamerule.")
+        @Comment("randomTickSpeed 0 zatrzymuje losowe ticki blokow - w lobby nie ma czemu rosnac,")
+        @Comment("a kazdy taki tick to praca serwera nad budowla, ktora ma stac nieruchomo.")
+        public Map<String, String> gamerules = new LinkedHashMap<>(Map.of("randomTickSpeed", "0"));
     }
 
     public static class MessagingSection extends OkaeriConfig {

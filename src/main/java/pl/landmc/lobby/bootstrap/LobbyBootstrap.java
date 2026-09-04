@@ -32,6 +32,8 @@ import pl.landmc.lobby.messaging.PongMessage;
 import pl.landmc.lobby.profile.ProfileRepository;
 import pl.landmc.lobby.profile.ProfileService;
 import pl.landmc.lobby.spawn.SpawnService;
+import pl.landmc.lobby.world.WorldSetup;
+import pl.landmc.lobby.world.WorldSetupListener;
 
 /**
  * Builds the lobby out of platform pieces and takes it down again.
@@ -125,6 +127,14 @@ public final class LobbyBootstrap {
                 .registerEvents(new UnknownCommandListener(platformNotices), this.plugin);
 
         this.startAutosave();
+
+        // Not applied here: this plugin is enabled at STARTUP so that it can generate the
+        // default world, which means no world exists yet. ServerLoadEvent is the first moment
+        // they do.
+        this.plugin.getServer().getPluginManager().registerEvents(
+                new WorldSetupListener(
+                        new WorldSetup(this.plugin.getServer(), this.config, this.logger)),
+                this.plugin);
 
         if (!spawn.isSet()) {
             this.logger.warn("Lobby spawn is not set - use /setspawn to configure it.");
