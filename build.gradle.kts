@@ -1,3 +1,5 @@
+import java.util.zip.ZipFile
+
 plugins {
     `java-library`
     alias(libs.plugins.shadow)
@@ -74,6 +76,12 @@ tasks.shadowJar {
     // Relocated: libraries another plugin on the same server might also shade at a different
     // version. Not relocated: pl.landmc.platform, which only LandMC plugins load, and nothing
     // Paper already provides - those are excluded above instead.
+    //
+    // H2 is also not relocated, and that one is not a preference. H2's MVStore writes Java
+    // class names into the database file, so a relocated build produces a file that only that
+    // build can open: not the H2 console, not a backup tool, and not the next version of this
+    // plugin if the shade prefix ever changes. A profile database is the one thing here that is
+    // meant to outlive the jar that wrote it, so it must stay readable without it.
     val shaded = "pl.landmc.lobby.libs"
     listOf(
         "eu.okaeri",
@@ -84,7 +92,6 @@ tasks.shadowJar {
         "redis.clients",
         "org.json",
         "org.apache.commons.pool2",
-        "org.h2",
         "org.yaml.snakeyaml",
     ).forEach { relocate(it, "$shaded.$it") }
 
@@ -93,6 +100,41 @@ tasks.shadowJar {
 
     mergeServiceFiles()
 }
+
+/**
+ * Fails the build if H2 ends up relocated after all.
+ *
+ * H2 writes Java class names into the .mv.db file, so a relocated build produces a database
+ * only that build can open - and the failure shows up on somebody's server months later, as a
+ * plugin that will not enable on a database it wrote itself. Adding "org.h2" back to the
+ * relocation list is a one-line change with no visible consequence at build time, so the build
+ * checks the jar instead of relying on the comment being read.
+ */
+val checkDatabaseNotRelocated = tasks.register("checkDatabaseNotRelocated") {
+    group = "verification"
+    description = "Fails when H2 ends up relocated, which would tie the database file to one jar."
+    dependsOn(tasks.shadowJar)
+
+    val jarFile = tasks.shadowJar.flatMap { it.archiveFile }
+    inputs.file(jarFile)
+
+    doLast {
+        val relocated = ZipFile(jarFile.get().asFile).use { zip ->
+            zip.entries().asSequence()
+                .map { it.name }
+                .filter { it.startsWith("pl/landmc/lobby/libs/org/h2/") }
+                .take(1)
+                .toList()
+        }
+
+        check(relocated.isEmpty()) {
+            "H2 is relocated (${relocated.first()}). A database written by this jar could then " +
+                "only be opened by this jar - see the note in the shadowJar block."
+        }
+    }
+}
+
+tasks.named("check") { dependsOn(checkDatabaseNotRelocated) }
 
 tasks.build {
     dependsOn(tasks.shadowJar)

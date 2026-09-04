@@ -94,6 +94,37 @@ i przy wyłączaniu serwera.
 Zapytania sortuje i ogranicza baza (`ORDER BY last_seen DESC LIMIT n`), a nie Java — tabela
 rośnie z każdym graczem, który kiedykolwiek wszedł.
 
+### Plik bazy H2 nie jest relokowany
+
+Shadow relokuje biblioteki, żeby nie zderzały się z kopiami z innych pluginów, ale **H2 jest
+z tego wyłączony celowo**. H2 zapisuje nazwy klas Javy do środka pliku `.mv.db`, więc plik
+zbudowany z relokowanym H2 potrafi otworzyć wyłącznie ten jeden jar. Zwykłe `h2.jar` odpowiada
+na taki plik `File corrupted while reading record`, a po zmianie prefiksu relokacji plugin
+przestałby czytać własną bazę.
+
+Baza profili ma przeżyć jara, który ją zapisał, więc musi być czytelna bez niego.
+
+### Migracja bazy sprzed tej zmiany
+
+Jeżeli masz `database.mv.db` zapisaną **starszą** wersją pluginu (z relokowanym H2), nowa
+wersja jej nie otworzy — wyłączy się z `Module database:landmc-lobby failed to enable`. Baza
+nie jest uszkodzona, tylko zapisana pod innymi nazwami klas. Przenosisz ją tak:
+
+```bash
+java -cp landmc-lobby-STARY.jar pl.landmc.lobby.libs.org.h2.tools.Script -url "jdbc:h2:file:./plugins/landmc-lobby/database;MODE=MySQL" -user "" -password "" -script profiles.sql
+```
+
+```bash
+java -cp h2-2.4.240.jar org.h2.tools.RunScript -url "jdbc:h2:file:./plugins/landmc-lobby/database;MODE=MySQL" -user "" -password "" -script profiles.sql
+```
+
+Między jednym a drugim skasuj (albo odłóż na bok) stary `database.mv.db` — `RunScript` dopisuje
+do istniejącej bazy, a nie zastępuje jej. Serwer musi być wyłączony: H2 w trybie plikowym
+dopuszcza jeden proces naraz.
+
+Sprawdzone na Paperze 26.2 z H2 2.4.240: po imporcie plugin wstaje normalnie, a profile są na
+miejscu. Zrób kopię `database.mv.db`, zanim zaczniesz.
+
 ## Konfiguracja
 
 `plugins/landmc-lobby/config.yml`:
