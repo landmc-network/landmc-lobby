@@ -22,10 +22,10 @@ public class LobbyMessages extends OkaeriConfig {
     @Comment("")
     @Comment("Komunikaty lobby.")
     @CustomKey("spawn-teleported")
-    public Notice spawnTeleported = Notice.chat("<green>Lobby> <gray>Przeniesiono na spawn.");
+    public Notice spawnTeleported = Notice.chat("<green><bold>LOBBY</bold> <gray>Przeniesiono na spawn.");
 
     @CustomKey("spawn-set")
-    public Notice spawnSet = Notice.chat("<green>Lobby> <gray>Ustawiono spawn w tym miejscu.");
+    public Notice spawnSet = Notice.chat("<green><bold>LOBBY</bold> <gray>Ustawiono spawn w tym miejscu.");
 
     @CustomKey("spawn-not-set")
     public Notice spawnNotSet =
@@ -34,7 +34,7 @@ public class LobbyMessages extends OkaeriConfig {
     @Comment("")
     @Comment("Placeholdery: {NAME}, {VISITS}, {FIRST_JOIN}, {LAST_SEEN}")
     @CustomKey("profile-header")
-    public Notice profileHeader = Notice.chat("<green>Lobby> <gray>Profil gracza <white>{NAME}</white>:");
+    public Notice profileHeader = Notice.chat("<green><bold>PROFIL</bold> <gray>Profil gracza <white>{NAME}</white>:");
 
     @CustomKey("profile-visits")
     public Notice profileVisits = Notice.chat("<dark_gray>» <gray>Wejść: <white>{VISITS}</white>");
@@ -49,5 +49,5 @@ public class LobbyMessages extends OkaeriConfig {
     @Comment("")
     @Comment("Wysylane po zapisaniu profili komenda administracyjna. Placeholder: {COUNT}")
     @CustomKey("profiles-saved")
-    public Notice profilesSaved = Notice.chat("<green>Lobby> <gray>Zapisano profili: <white>{COUNT}</white>.");
+    public Notice profilesSaved = Notice.chat("<green><bold>PROFIL</bold> <gray>Zapisano profili: <white>{COUNT}</white>.");
 }
