@@ -1,0 +1,16 @@
+name: landmc-lobby
+version: '${version}'
+main: pl.landmc.lobby.LandLobbyPlugin
+api-version: '26.2'
+description: Lobby sieci LandMC - spawn, profil gracza i komunikacja z proxy.
+author: Crispi
+website: https://github.com/landmc-network/landmc-lobby
+
+dependencies:
+  server:
+    # Optional: packet integrations are prepared but nothing uses them yet, so a server
+    # without PacketEvents must still load the lobby.
+    packetevents:
+      load: BEFORE
+      required: false
+      join-classpath: true
