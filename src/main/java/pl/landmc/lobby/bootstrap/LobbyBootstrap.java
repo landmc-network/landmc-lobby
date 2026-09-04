@@ -9,6 +9,7 @@ import org.bukkit.plugin.Plugin;
 import org.slf4j.Logger;
 import pl.landmc.platform.api.ModuleLifecycle;
 import pl.landmc.platform.component.ComponentFormatter;
+import pl.landmc.platform.config.ConfigPlaceholders;
 import pl.landmc.platform.config.ConfigService;
 import pl.landmc.platform.database.DatabaseService;
 import pl.landmc.platform.messaging.MessageBus;
@@ -81,7 +82,8 @@ public final class LobbyBootstrap {
         PaperNoticeService<LobbyMessages> notices =
                 new PaperNoticeService<>(locale -> this.messages, formatter);
 
-        this.configs = new ConfigService(notices.okaeriSerdes());
+        this.configs = new ConfigService(
+                ConfigPlaceholders.forPlugin(this.dataDirectory), notices.okaeriSerdes());
         this.config = this.configs.load(this.dataDirectory, "config.yml", LobbyConfig.class);
         this.messages = this.configs.load(this.dataDirectory, "messages.yml", LobbyMessages.class);
         this.logger.info("Loaded configuration.");
