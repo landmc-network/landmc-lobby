@@ -5,7 +5,7 @@
 # decided once, in landmc-platform's catalog.
 [versions]
 
-landmc-platform = "1.0.0-SNAPSHOT"
+landmc-platform = "1.0.0"
 
 # Paper 26.2 publishes Java 25 bytecode, which is why this project compiles with --release 25.
 paper = "26.2.build.121-stable"
