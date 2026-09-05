@@ -35,10 +35,6 @@ dependencies {
     // a renamed package makes a stack trace from one side unreadable on the other.
     implementation(libs.menus.api)
 
-    // Ranks are LuckPerms groups. compileOnly, and the one class that names a
-    // LuckPerms type is loaded only once it is known to be installed.
-    compileOnly(libs.luckperms.api)
-
     implementation(libs.platform.api)
     implementation(libs.platform.common)
     implementation(libs.platform.config)

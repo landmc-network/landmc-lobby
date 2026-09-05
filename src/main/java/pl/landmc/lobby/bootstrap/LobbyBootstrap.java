@@ -28,13 +28,10 @@ import pl.landmc.lobby.hotbar.HotbarChannel;
 import pl.landmc.lobby.hotbar.HotbarService;
 import pl.landmc.lobby.sidebar.BalanceTracker;
 import pl.landmc.lobby.sidebar.ScoreboardService;
-import pl.landmc.lobby.tablist.RankPrefixes;
-import pl.landmc.lobby.tablist.TablistService;
 import pl.landmc.lobby.listener.HotbarListener;
 import pl.landmc.lobby.listener.ProfileListener;
 import pl.landmc.lobby.listener.ScoreboardListener;
 import pl.landmc.lobby.listener.ServerLoadedListener;
-import pl.landmc.lobby.listener.TablistListener;
 import pl.landmc.lobby.listener.SpawnListener;
 import pl.landmc.lobby.messaging.LobbyMessaging;
 import pl.landmc.lobby.messaging.PingMessage;
@@ -137,7 +134,6 @@ public final class LobbyBootstrap {
                 .registerEvents(new UnknownCommandListener(platformNotices), this.plugin);
 
         this.startScoreboards(formatter);
-        this.startTablist(formatter);
 
         HotbarService hotbar = new HotbarService(this.config, formatter, this.logger);
         if (hotbar.isEnabled()) {
@@ -227,41 +223,6 @@ public final class LobbyBootstrap {
      * player straight away; the periodic pass is for the lines nothing announces, such as how
      * many people are online.
      */
-    /**
-     * Starts the tab list.
-     *
-     * <p>Refreshed on the same timer as the scoreboard rather than on a LuckPerms event: an
-     * entry is only written when it actually changed, so a pass over the players costs a string
-     * comparison each and nothing goes out over the network unless a rank moved.
-     */
-    private void startTablist(ComponentFormatter formatter) {
-        TablistService tablist = new TablistService(this.config, formatter);
-
-        if (!tablist.isEnabled()) {
-            this.logger.info("Tab list prefixes are off; names are shown plain.");
-            return;
-        }
-
-        this.plugin.getServer().getPluginManager()
-                .registerEvents(new TablistListener(tablist), this.plugin);
-
-        // Bound after the server has loaded, not now: this plugin is enabled at STARTUP so it
-        // can generate the default world, which puts it ahead of LuckPerms.
-        this.plugin.getServer().getPluginManager().registerEvents(
-                new ServerLoadedListener(() -> {
-                    tablist.prefixes(RankPrefixes.create(this.logger));
-                    tablist.applyAll(this.plugin.getServer().getOnlinePlayers());
-                }),
-                this.plugin);
-
-        long ticks = Math.max(1L, this.config.scoreboard.refreshTicks);
-        this.plugin.getServer().getScheduler().runTaskTimer(
-                this.plugin,
-                () -> tablist.applyAll(this.plugin.getServer().getOnlinePlayers()),
-                ticks,
-                ticks);
-    }
-
     private void startScoreboards(ComponentFormatter formatter) {
         BalanceTracker balances = new BalanceTracker(this.plugin, this.logger);
         ScoreboardService scoreboards = new ScoreboardService(this.config, balances, formatter);
