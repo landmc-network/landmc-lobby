@@ -38,6 +38,9 @@ public class NpcCommand {
      */
     public static final String NAME_ARGUMENT = "npc";
 
+    /** The name of the outfit argument, suggested the same way. */
+    public static final String PRESET_ARGUMENT = "szablon";
+
     private final NpcService npcs;
     private final PaperNoticeService<LobbyMessages> notices;
 
@@ -156,6 +159,30 @@ public class NpcCommand {
         }
 
         this.npcs.setArmourColour(entry, colour);
+        this.notices.viewer(player, messages -> messages.npcUpdated, named(entry.id));
+    }
+
+    @Execute(name = "szablon")
+    void preset(
+            @Context Player player,
+            @Arg(NAME_ARGUMENT) String id,
+            @Arg(PRESET_ARGUMENT) String preset) {
+
+        LobbyConfig.NpcEntry entry = this.entry(player, id);
+        if (entry == null) {
+            return;
+        }
+
+        LobbyConfig.NpcPreset outfit = this.npcs.preset(preset);
+        if (outfit == null) {
+            this.notices.viewer(
+                    player,
+                    messages -> messages.npcUnknownPreset,
+                    named(preset));
+            return;
+        }
+
+        this.npcs.dressUp(entry, outfit);
         this.notices.viewer(player, messages -> messages.npcUpdated, named(entry.id));
     }
 

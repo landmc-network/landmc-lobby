@@ -67,14 +67,17 @@ public class LobbyConfig extends OkaeriConfig {
         public long refreshTicks = 40L;
 
         @Comment("")
-        @Comment("Ile nad figurka wisi licznik graczy i tekst zachety, w blokach.")
-        @Comment("Wartosci ze starego LandMC to 2.25 i 2.5; tam byly to armor standy,")
-        @Comment("wiec napis siedzial nieco inaczej i moze wymagac paru setnych korekty.")
+        @Comment("Ile nad figurka wisza kolejno: nazwa, licznik graczy i tekst zachety.")
+        @Comment("Wszystkie trzy sa naszymi napisami, wiec odstepy sa rowne i przewidywalne;")
+        @Comment("stary serwer zostawial nazwe Minecraftowi i dlatego siedziala gdzie chciala.")
+        @CustomKey("name-offset")
+        public double nameOffset = 2.15D;
+
         @CustomKey("count-offset")
-        public double countOffset = 2.25D;
+        public double countOffset = 2.45D;
 
         @CustomKey("addon-offset")
-        public double addonOffset = 2.55D;
+        public double addonOffset = 2.75D;
 
         @Comment("")
         @Comment("Napis z liczba graczy. {ONLINE} to liczba z TAMTEGO serwera, nie z lobby -")
@@ -120,8 +123,104 @@ public class LobbyConfig extends OkaeriConfig {
         public double viewRange = 1.0D;
 
         @Comment("")
+        @Comment("Stroje. Nowa figurka dostaje ten, ktorego nazwa zgadza sie z serwerem -")
+        @Comment("wiec /npc utworz na serwer skyblock ubiera ja od razu. Pozniej zmienia to")
+        @Comment("/npc szablon. Wartosci sa przepisane ze starego LandMC, gdzie kazdy tryb")
+        @Comment("mial swoj stroj wpisany w kod i nie dalo sie go ruszyc bez kompilacji.")
+        public List<NpcPreset> presets = new ArrayList<>(List.of(
+                preset(
+                        "skyblock",
+                        "https://textures.minecraft.net/texture/"
+                                + "a96d16691ff549e8d1897a2190fbc4e0f642c910fa3da1ae19b45fa9c4f3bc2",
+                        "#556B2F",
+                        "GRASS_BLOCK",
+                        List.of(),
+                        List.of(294.08D, 0.0D, 147.04D),
+                        List.of(0.0D, 116.62D, 344.79D),
+                        List.of()),
+                preset(
+                        "budowlany",
+                        "https://textures.minecraft.net/texture/"
+                                + "637ec2c01b3f55b9ed09cac1c5378732abf26f383ba0a0df3eac2e29e280c3",
+                        "#FFFF00",
+                        "CRAFTING_TABLE",
+                        List.of(50.0D, 97.0D, 27.0D),
+                        List.of(357.0D, 40.0D, 14.0D),
+                        List.of(9.0D, 17.0D, 12.0D),
+                        List.of(0.0D, 29.0D, 72.0D)),
+                preset(
+                        "partygames",
+                        "https://textures.minecraft.net/texture/"
+                                + "fa4c0a8c200c4f1fedf8bbbe31daa81504dcb2f920b00e71f85e0eb1904a1929",
+                        "#A06540",
+                        "NETHER_STAR",
+                        List.of(56.0D, 65.0D, 282.0D),
+                        List.of(0.0D, 0.0D, 134.0D),
+                        List.of(27.0D, 27.0D, 354.0D),
+                        List.of(0.0D, 67.0D, 39.0D))));
+
+        @Comment("")
         @Comment("Postawione figurki. Pisze to /npc, recznie zwykle nie trzeba tu zagladac.")
         public List<NpcEntry> list = new ArrayList<>();
+
+        private static NpcPreset preset(
+                String id,
+                String skin,
+                String armourColour,
+                String item,
+                List<Double> leftArm,
+                List<Double> rightArm,
+                List<Double> leftLeg,
+                List<Double> rightLeg) {
+
+            NpcPreset preset = new NpcPreset();
+            preset.id = id;
+            preset.skin = skin;
+            preset.armourColour = armourColour;
+            preset.item = item;
+            preset.leftArm = new ArrayList<>(leftArm);
+            preset.rightArm = new ArrayList<>(rightArm);
+            preset.leftLeg = new ArrayList<>(leftLeg);
+            preset.rightLeg = new ArrayList<>(rightLeg);
+            return preset;
+        }
+    }
+
+    /**
+     * How one kind of figure is dressed and posed.
+     *
+     * <p>Separate from the figure itself because the two answer different questions. Where a
+     * figure stands is about this map and nothing else; what it wears is about the mode it
+     * advertises, and is the same on every lobby the network ever has.
+     */
+    public static class NpcPreset extends OkaeriConfig {
+
+        @Comment("Nazwa szablonu. Zgodna z nazwa serwera = zakladany automatycznie.")
+        public String id = "";
+
+        @Comment("Adres tekstury glowy.")
+        public String skin = "";
+
+        @Comment("Kolor skorzanej zbroi, szesnastkowo.")
+        @CustomKey("armour-colour")
+        public String armourColour = "";
+
+        @Comment("Przedmiot w rece.")
+        public String item = "";
+
+        @Comment("")
+        @Comment("Pozy, po trzy stopnie: obrot wokol X, Y i Z. Pusta lista = poza domyslna.")
+        @CustomKey("left-arm")
+        public List<Double> leftArm = new ArrayList<>();
+
+        @CustomKey("right-arm")
+        public List<Double> rightArm = new ArrayList<>();
+
+        @CustomKey("left-leg")
+        public List<Double> leftLeg = new ArrayList<>();
+
+        @CustomKey("right-leg")
+        public List<Double> rightLeg = new ArrayList<>();
     }
 
     /** One figure: where it stands, what it is called and where it sends you. */
@@ -153,7 +252,8 @@ public class LobbyConfig extends OkaeriConfig {
         @Comment("Adres tekstury glowy. Puste = zwykla glowa gracza.")
         public String skin = "";
 
-        @Comment("Kolor skorzanej zbroi, szesnastkowo. Puste = zbroja bez barwienia.")
+        @Comment("Kolor skorzanej zbroi: nazwa (green, gold, brown...) albo #rrggbb.")
+        @Comment("Puste = zbroja bez barwienia.")
         @CustomKey("armour-colour")
         public String armourColour = "";
 

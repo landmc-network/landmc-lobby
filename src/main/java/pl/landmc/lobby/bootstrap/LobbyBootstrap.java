@@ -172,6 +172,11 @@ public final class LobbyBootstrap {
                         ArgumentKey.of(NpcCommand.NAME_ARGUMENT),
                         (invocation, argument, context) ->
                                 SuggestionResult.of(this.npcs.ids()))
+                .argumentSuggester(
+                        String.class,
+                        ArgumentKey.of(NpcCommand.PRESET_ARGUMENT),
+                        (invocation, argument, context) ->
+                                SuggestionResult.of(this.npcs.presets()))
                 .commands(commands.toArray())
                 .build();
         this.logger.info("Registered {} commands.", commands.size());

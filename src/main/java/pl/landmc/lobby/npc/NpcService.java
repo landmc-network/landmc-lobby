@@ -63,7 +63,8 @@ public final class NpcService {
     /** The armour stand of each figure, by hologram id. */
     private final Map<String, UUID> figures = new HashMap<>();
 
-    /** Its two labels, in the same order as they stand: the count, then the invitation. */
+    /** Its three labels, in the order they stand: name, count, invitation. */
+    private final Map<String, UUID> nameLabels = new HashMap<>();
     private final Map<String, UUID> countLabels = new HashMap<>();
     private final Map<String, UUID> addonLabels = new HashMap<>();
 
@@ -171,6 +172,10 @@ public final class NpcService {
         entry.server = server;
         entry.name = name;
         entry.addon = this.config.npcs.defaultAddon;
+        // Dressed on the way up when the network has a preset for that mode. The old server
+        // had one per mode written into its source; a figure standing there naked because
+        // nobody typed a second command is a worse default than either.
+        wear(entry, this.preset(server));
         write(entry, location);
 
         this.config.npcs.list.add(entry);
@@ -219,6 +224,45 @@ public final class NpcService {
         this.changed(entry);
     }
 
+    /** The outfit under that name, or null when the file has none. */
+    public LobbyConfig.NpcPreset preset(String id) {
+        for (LobbyConfig.NpcPreset preset : this.config.npcs.presets) {
+            if (preset.id.equalsIgnoreCase(id)) {
+                return preset;
+            }
+        }
+        return null;
+    }
+
+    public List<String> presets() {
+        List<String> ids = new ArrayList<>(this.config.npcs.presets.size());
+        for (LobbyConfig.NpcPreset preset : this.config.npcs.presets) {
+            ids.add(preset.id);
+        }
+        return ids;
+    }
+
+    /** Puts an outfit on a figure that is already standing. */
+    public void wear(LobbyConfig.NpcEntry entry, LobbyConfig.NpcPreset preset) {
+        if (preset == null) {
+            return;
+        }
+
+        entry.skin = preset.skin;
+        entry.armourColour = preset.armourColour;
+        entry.item = preset.item;
+        entry.leftArm = new ArrayList<>(preset.leftArm);
+        entry.rightArm = new ArrayList<>(preset.rightArm);
+        entry.leftLeg = new ArrayList<>(preset.leftLeg);
+        entry.rightLeg = new ArrayList<>(preset.rightLeg);
+    }
+
+    /** The same, from a command, so it is written down and put up again. */
+    public void dressUp(LobbyConfig.NpcEntry entry, LobbyConfig.NpcPreset preset) {
+        this.wear(entry, preset);
+        this.changed(entry);
+    }
+
     private void changed(LobbyConfig.NpcEntry entry) {
         this.configs.save(this.config);
         // Everything about how the figure looks is decided when it is spawned, so a change to
@@ -247,6 +291,8 @@ public final class NpcService {
             }
 
             this.figure(entry, world);
+            this.label(entry, world, this.nameLabels, this.config.npcs.nameOffset,
+                    entry.id + ":name", entry.name);
             this.label(entry, world, this.countLabels, this.config.npcs.countOffset,
                     entry.id + ":count", this.countText(entry));
 
@@ -367,8 +413,8 @@ public final class NpcService {
                 spawned.setInvulnerable(true);
                 spawned.setSilent(true);
                 spawned.setPersistent(false);
-                spawned.customName(this.formatter.format(entry.name));
-                spawned.setCustomNameVisible(true);
+                // The name is one of our own displays, above, so all three lines are
+                // spaced by us rather than by wherever Minecraft chooses to draw a name tag.
 
                 this.dress(spawned, entry);
                 pose(spawned, entry);
@@ -449,15 +495,63 @@ public final class NpcService {
         return piece;
     }
 
-    /** A colour written as {@code #rrggbb}, or null when the field is empty or wrong. */
-    private static Color colour(String hex) {
-        String value = hex.startsWith("#") ? hex.substring(1) : hex;
-        if (value.length() != 6) {
+    /**
+     * The colours a name can be given, so dyed armour does not have to be written in hex.
+     *
+     * <p>Minecraft's own sixteen, plus the few words somebody reaches for anyway. Anybody
+     * setting a figure's armour is standing in the game looking at it, and "green" is what they
+     * will type.
+     */
+    private static final Map<String, Integer> NAMED_COLOURS = Map.ofEntries(
+            Map.entry("black", 0x000000),
+            Map.entry("dark_blue", 0x0000AA),
+            Map.entry("dark_green", 0x00AA00),
+            Map.entry("dark_aqua", 0x00AAAA),
+            Map.entry("dark_red", 0xAA0000),
+            Map.entry("dark_purple", 0xAA00AA),
+            Map.entry("gold", 0xFFAA00),
+            Map.entry("gray", 0xAAAAAA),
+            Map.entry("dark_gray", 0x555555),
+            Map.entry("blue", 0x5555FF),
+            Map.entry("green", 0x55FF55),
+            Map.entry("aqua", 0x55FFFF),
+            Map.entry("red", 0xFF5555),
+            Map.entry("light_purple", 0xFF55FF),
+            Map.entry("yellow", 0xFFFF55),
+            Map.entry("white", 0xFFFFFF),
+            Map.entry("lime", 0x55FF55),
+            Map.entry("orange", 0xFF8000),
+            Map.entry("brown", 0xA06540),
+            Map.entry("pink", 0xFF9AC0),
+            Map.entry("cyan", 0x00AAAA),
+            Map.entry("magenta", 0xFF55FF),
+            Map.entry("olive", 0x556B2F),
+            Map.entry("leather", 0xA06540));
+
+    /**
+     * A colour by name or as {@code #rrggbb}, or null when the field is empty or unreadable.
+     *
+     * <p>Null rather than a fallback colour: a figure with no armour reads as one nobody has
+     * dressed yet, and a figure in a colour nobody asked for reads as a bug.
+     */
+    private static Color colour(String written) {
+        String value = written.trim();
+        if (value.isEmpty()) {
+            return null;
+        }
+
+        Integer named = NAMED_COLOURS.get(value.toLowerCase(Locale.ROOT));
+        if (named != null) {
+            return Color.fromRGB(named);
+        }
+
+        String hex = value.startsWith("#") ? value.substring(1) : value;
+        if (hex.length() != 6) {
             return null;
         }
 
         try {
-            return Color.fromRGB(Integer.parseInt(value, 16));
+            return Color.fromRGB(Integer.parseInt(hex, 16));
         }
         catch (IllegalArgumentException wrong) {
             return null;
@@ -466,8 +560,10 @@ public final class NpcService {
 
     private void takeDown(String id) {
         this.despawn(this.figures.remove(id));
+        this.despawn(this.nameLabels.remove(id));
         this.despawn(this.countLabels.remove(id));
         this.despawn(this.addonLabels.remove(id));
+        this.written.remove(id + ":name");
         this.written.remove(id + ":count");
         this.written.remove(id + ":addon");
         this.byBlock.values().remove(id);
@@ -482,6 +578,7 @@ public final class NpcService {
             this.despawn(shownId);
         }
         this.figures.clear();
+        this.nameLabels.clear();
         this.countLabels.clear();
         this.addonLabels.clear();
         this.written.clear();
