@@ -24,6 +24,9 @@ public class LobbyConfig extends OkaeriConfig {
     public HotbarSection hotbar = new HotbarSection();
 
     @Comment("")
+    public ScoreboardSection scoreboard = new ScoreboardSection();
+
+    @Comment("")
     public WorldSection world = new WorldSection();
 
     @Comment("Baza danych profili lobby. H2 dziala bez zadnej konfiguracji.")
@@ -199,5 +202,39 @@ public class LobbyConfig extends OkaeriConfig {
             this.lore = new ArrayList<>(lore);
             this.menu = menu;
         }
+    }
+
+    /** The sidebar, in the shape the old lobby drew it. */
+    public static class ScoreboardSection extends OkaeriConfig {
+
+        @Comment("Czy gracze na lobby widza scoreboard.")
+        public boolean enabled = true;
+
+        @Comment("")
+        @Comment("Co ile tickow odswiezane sa linie ze zmiennymi. 20 tickow to sekunda.")
+        @Comment("Zmieniaja sie tylko te linie, ktore zawieraja placeholder.")
+        @CustomKey("refresh-ticks")
+        public int refreshTicks = 20;
+
+        @Comment("")
+        public String title = "<white>   <yellow><bold>LandMC.PL</bold><white>   ";
+
+        @Comment("")
+        @Comment("Linie od gory. Maksymalnie 16.")
+        @Comment("Placeholdery: {PLAYER}, {SERVER}, {ONLINE}, {DIAMONDS}, {COINS}, {LEVEL}")
+        @Comment("{COINS} i {LEVEL} pokazuja na razie zero - sieć nie ma jeszcze drugiej")
+        @Comment("waluty ani poziomow. Zapala sie same, kiedy te systemy powstana.")
+        public List<String> lines = new ArrayList<>(List.of(
+                " ",
+                "<green><bold>Podserwer",
+                "<white>{SERVER}",
+                "  ",
+                "<light_purple><bold>Statystyki <white>gracza",
+                "<light_purple>• <white>Monety: <gold>{COINS}",
+                "<light_purple>• <white>Diamenty: <aqua>{DIAMONDS}❖",
+                "<light_purple>• <white>Poziom: <gold>{LEVEL}✰",
+                "   ",
+                "<yellow><bold>Strona <white>serwera",
+                "<white>landmc.pl"));
     }
 }

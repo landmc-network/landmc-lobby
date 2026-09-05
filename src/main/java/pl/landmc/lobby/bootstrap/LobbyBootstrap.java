@@ -26,8 +26,11 @@ import pl.landmc.lobby.config.LobbyConfig;
 import pl.landmc.lobby.config.LobbyMessages;
 import pl.landmc.lobby.hotbar.HotbarChannel;
 import pl.landmc.lobby.hotbar.HotbarService;
+import pl.landmc.lobby.sidebar.BalanceTracker;
+import pl.landmc.lobby.sidebar.ScoreboardService;
 import pl.landmc.lobby.listener.HotbarListener;
 import pl.landmc.lobby.listener.ProfileListener;
+import pl.landmc.lobby.listener.ScoreboardListener;
 import pl.landmc.lobby.listener.SpawnListener;
 import pl.landmc.lobby.messaging.LobbyMessaging;
 import pl.landmc.lobby.messaging.PingMessage;
@@ -129,6 +132,8 @@ public final class LobbyBootstrap {
         this.plugin.getServer().getPluginManager()
                 .registerEvents(new UnknownCommandListener(platformNotices), this.plugin);
 
+        this.startScoreboards(formatter);
+
         HotbarService hotbar = new HotbarService(this.config, formatter, this.logger);
         if (hotbar.isEnabled()) {
             this.plugin.getServer().getPluginManager().registerEvents(
@@ -201,6 +206,32 @@ public final class LobbyBootstrap {
      * <p>One repeating task for the whole server, not one per player: the task collects the
      * dirty profiles on the main thread and hands a single batch to the database.
      */
+    /**
+     * Starts the sidebar, and the one task that keeps it current.
+     *
+     * <p>The balances it shows come from the proxy over a plugin channel - this server does not
+     * own a wallet and must not query one per player per second. A change arriving redraws that
+     * player straight away; the periodic pass is for the lines nothing announces, such as how
+     * many people are online.
+     */
+    private void startScoreboards(ComponentFormatter formatter) {
+        BalanceTracker balances = new BalanceTracker(this.plugin, this.logger);
+        ScoreboardService scoreboards = new ScoreboardService(this.config, balances, formatter);
+        balances.onChanged(scoreboards::refresh);
+
+        if (!scoreboards.isEnabled()) {
+            this.logger.info("Lobby scoreboard is off.");
+            return;
+        }
+
+        this.plugin.getServer().getPluginManager()
+                .registerEvents(new ScoreboardListener(scoreboards), this.plugin);
+
+        long ticks = Math.max(1L, this.config.scoreboard.refreshTicks);
+        this.plugin.getServer().getScheduler()
+                .runTaskTimer(this.plugin, scoreboards::refreshAll, ticks, ticks);
+    }
+
     private void startAutosave() {
         int seconds = this.config.lobby.autosaveSeconds;
         if (seconds <= 0) {

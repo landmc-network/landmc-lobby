@@ -7,7 +7,7 @@
 
 # The menu wire format, published by landmc-menus. Only the protocol: this plugin
 # asks the proxy to open a menu, it does not draw one.
-landmc-menus = "1.2.1"
+landmc-menus = "1.3.0"
 
 landmc-platform = "1.4.0"
 
