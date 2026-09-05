@@ -179,9 +179,45 @@ technicznymi.
 | `/spawn` | — | teleport na spawn lobby |
 | `/setspawn` | `landmc.command.setspawn` | ustawienie spawnu w miejscu gracza |
 | `/profil`, `/profile` | — | profil gracza z cache |
+| `/fly` | ranga | latanie na lobby |
+| `/npc` | `landmc.command.npc` | stawianie i ubieranie figurek na spawnie |
 
 `/profil` czyta **cache, nie bazę**. Profil został wczytany przy wejściu, więc zapytanie tutaj
 byłoby round tripem po dane, które serwer ma w pamięci — i to na main threadzie.
+
+## Figurki na spawnie
+
+Po jednej na tryb, tak jak na poprzedniej wersji sieci: ubrany i wypozowany armor stand z nazwą
+trybu, nad nim liczba grających, a nad tym mrugająca zachęta. Kliknięcie albo wejście na jej blok
+przenosi na ten serwer.
+
+Trzy napisy nad figurką to **nasze** `TextDisplay`, a nie name tag standa i dwa niewidzialne
+markery. Minecraft rysuje name tag tam, gdzie mu wygodnie, więc odstępy trzeba było zgadywać;
+tutaj wszystkie trzy stawiamy sami i są równe.
+
+Liczba graczy **nie jest stąd**. Backend widzi tylko tych, którzy na nim stoją, więc proxy
+rozgłasza co dwie sekundy liczby ze wszystkich serwerów (`network.server-counts`), a figurka
+tylko je pokazuje. Zanim przyjdzie pierwsza wiadomość, napis mówi `...` — tryb pusty i tryb, o
+którym jeszcze nie słyszeliśmy, to co innego.
+
+Figurka może też **otwierać menu** zamiast przenosić (`/npc menu <figurka> SHOP`) — na starym
+serwerze stał tak NPC sklepu. W tym trybie nie ma nad nią licznika i wejście w nią niczego nie
+otwiera; menu, które pojawia się dlatego, że ktoś przeszedł obok, to menu, o które nie prosił.
+
+Stroje są w configu jako szablony, przepisane z tego, co poprzedni serwer miał wpisane w kod, i
+nowa figurka dostaje ten o nazwie zgodnej z serwerem. Pozycje pisze komenda, nie człowiek —
+figurka to głównie miejsce i kierunek, a nikt nie zna współrzędnych punktu, na którym stoi.
+
+| Komenda | Działanie |
+|---|---|
+| `/npc utworz <nazwa> <serwer> <napis>` | stawia figurkę tam, gdzie stoisz |
+| `/npc tutaj <nazwa>` | przenosi ją w to miejsce |
+| `/npc usun <nazwa>` | usuwa ją |
+| `/npc serwer <nazwa> <id>` | ustawia, na jaki serwer przenosi |
+| `/npc menu <nazwa> <menu>` | zamiast przenosić, otwiera menu |
+| `/npc szablon <nazwa> <szablon>` | ubiera ją w gotowy strój |
+| `/npc nazwa\|zacheta\|skorka\|przedmiot\|kolor` | pojedyncze elementy wyglądu |
+| `/npc lista` | wypisuje wszystkie z pozycjami |
 
 ## Messaging
 
@@ -197,8 +233,9 @@ procesu, więc plugin działa bez Redisa.
 
 ## Czego tu nie ma
 
-Zgodnie z zakresem: NPC, scoreboardu, tablisty, kosmetyk, menu wyboru trybu. Pierwsza wersja
-ma udowodnić, że fundament działa pod realnym obciążeniem, a nie dowieźć całe lobby.
+Tablisty i czatu — to `landmc-chat`. Kosmetyk — `landmc-cosmetics`. Rysowania menu —
+`landmc-menus`; lobby prosi proxy o otwarcie, bo menu buduje ta strona, która ma dane.
+Dodatków do rang i hologramów — `landmc-tools`.
 
 ## Testy
 

@@ -177,6 +177,11 @@ public final class LobbyBootstrap {
                         ArgumentKey.of(NpcCommand.PRESET_ARGUMENT),
                         (invocation, argument, context) ->
                                 SuggestionResult.of(this.npcs.presets()))
+                .argumentSuggester(
+                        String.class,
+                        ArgumentKey.of(NpcCommand.MENU_ARGUMENT),
+                        (invocation, argument, context) ->
+                                SuggestionResult.of(menuNames()))
                 .commands(commands.toArray())
                 .build();
         this.logger.info("Registered {} commands.", commands.size());
@@ -251,6 +256,15 @@ public final class LobbyBootstrap {
      * returning would race the JVM shutting down, and the last session of every online player
      * would be the thing that gets lost.
      */
+    /** The menus a figure can be pointed at, for tab completion. */
+    private static List<String> menuNames() {
+        List<String> names = new ArrayList<>();
+        for (pl.landmc.menus.protocol.MenuKind kind : pl.landmc.menus.protocol.MenuKind.values()) {
+            names.add(kind.name());
+        }
+        return names;
+    }
+
     public void stop() {
         this.logger.info("LandMC Lobby stopping...");
 

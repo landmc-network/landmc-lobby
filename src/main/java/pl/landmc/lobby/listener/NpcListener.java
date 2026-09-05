@@ -1,6 +1,8 @@
 package pl.landmc.lobby.listener;
 
+import java.util.Locale;
 import java.util.Objects;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -12,6 +14,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import pl.landmc.lobby.config.LobbyConfig;
 import pl.landmc.lobby.menu.MenuChannel;
 import pl.landmc.lobby.npc.NpcService;
+import pl.landmc.menus.protocol.MenuKind;
 
 /**
  * Sending somebody to a game mode by clicking its figure, or by walking into it.
@@ -95,15 +98,61 @@ public final class NpcListener implements Listener {
         }
 
         LobbyConfig.NpcEntry entry = this.npcs.standingIn(event.getTo());
-        if (entry != null) {
+        // Walking through a figure that opens a menu does not open it: a menu that appears
+        // because somebody walked past is a menu they did not ask for.
+        if (entry != null && NpcService.sendsToAServer(entry)) {
             this.send(event.getPlayer(), entry);
         }
     }
 
+    /**
+     * Does whatever the figure is for.
+     *
+     * <p>Both halves go through the proxy. Moving somebody to another server is obviously its
+     * business, and so is opening a menu: the menus are drawn from a payload the proxy builds,
+     * and a backend has no list of them to open.
+     */
     private void send(Player player, LobbyConfig.NpcEntry entry) {
-        if (entry.server.isBlank()) {
+        if (NpcService.sendsToAServer(entry)) {
+            if (entry.server.isBlank()) {
+                return;
+            }
+            this.channel.connect(player, entry.server);
+            this.click(player);
             return;
         }
-        this.channel.connect(player, entry.server);
+
+        MenuKind menu = menu(entry.menu);
+        if (menu == null) {
+            return;
+        }
+        this.channel.open(player, menu);
+        this.click(player);
+    }
+
+    /** The note the old server played when somebody clicked one of these. */
+    private void click(Player player) {
+        String name = this.config.npcs.clickSound;
+        if (name.isBlank()) {
+            return;
+        }
+
+        try {
+            player.playSound(
+                    player.getLocation(), Sound.valueOf(name.toUpperCase(Locale.ROOT)), 1.0F, 1.0F);
+        }
+        catch (IllegalArgumentException unknown) {
+            // A name this build does not have. Silent: a missing note is not worth a line in
+            // the log every time somebody clicks.
+        }
+    }
+
+    private static MenuKind menu(String name) {
+        try {
+            return MenuKind.valueOf(name.toUpperCase(Locale.ROOT));
+        }
+        catch (IllegalArgumentException unknown) {
+            return null;
+        }
     }
 }

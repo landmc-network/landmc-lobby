@@ -107,9 +107,16 @@ public class LobbyConfig extends OkaeriConfig {
 
         @Comment("")
         @Comment("Czy wejscie na blok figurki tez przenosi na serwer, tak jak na starym LandMC.")
-        @Comment("Klikniecie dziala zawsze.")
+        @Comment("Klikniecie dziala zawsze. Dotyczy tylko figurek przenoszacych na serwer -")
+        @Comment("w figurke otwierajaca menu mozna wejsc bez otwierania czegokolwiek.")
         @CustomKey("walk-in")
         public boolean walkIn = true;
+
+        @Comment("")
+        @Comment("Dzwiek klikniecia w figurke. Stary serwer gral tu BLOCK_NOTE_BASS.")
+        @Comment("Puste = bez dzwieku.")
+        @CustomKey("click-sound")
+        public String clickSound = "BLOCK_NOTE_BLOCK_BASS";
 
         @Comment("")
         @Comment("Przezroczystosc tla pod napisami, 0-255. Zero to sam tekst, jak nad glowa")
@@ -229,8 +236,17 @@ public class LobbyConfig extends OkaeriConfig {
         @Comment("Nazwa uzywana w komendach.")
         public String id = "";
 
+        @Comment("Co robi klikniecie: SERWER przenosi na serwer z pola nizej,")
+        @Comment("MENU otwiera menu. Na starym LandMC byly obie: figurki trybow przenosily,")
+        @Comment("a figurka sklepu odpalala /sklep.")
+        public String action = "SERWER";
+
         @Comment("Serwer, na ktory przenosi. Ta sama nazwa, co w konfiguracji proxy.")
         public String server = "";
+
+        @Comment("Menu otwierane przy action: MENU. SHOP, RANKS, VISUAL_RANKS, COSMETICS,")
+        @Comment("PROFILE, STATISTICS, SERVERS, LOBBIES, FRIENDS, PUNISHMENTS, REPORT.")
+        public String menu = "";
 
         @Comment("Napis nad figurka i tekst zachety pod nim. MiniMessage;")
         @Comment("kolor zachety nadaja addon-colours, wiec tutaj sam tekst.")

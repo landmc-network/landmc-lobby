@@ -84,6 +84,10 @@ public class LobbyMessages extends OkaeriConfig {
     public Notice npcUnknown = Notice.chat(
             "<red>Błąd> <gray>Nie ma figurki o nazwie <white>{ID}</white>.");
 
+    @CustomKey("npc-unknown-menu")
+    public Notice npcUnknownMenu = Notice.chat(
+            "<red>Błąd> <gray>Nie ma menu o nazwie <white>{ID}</white>.");
+
     @CustomKey("npc-unknown-preset")
     public Notice npcUnknownPreset = Notice.chat(
             "<red>Błąd> <gray>Nie ma szablonu o nazwie <white>{ID}</white>.");

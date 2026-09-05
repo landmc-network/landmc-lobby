@@ -224,6 +224,24 @@ public final class NpcService {
         this.changed(entry);
     }
 
+    /** Whether clicking this figure moves somebody to another server. */
+    public static boolean sendsToAServer(LobbyConfig.NpcEntry entry) {
+        return !"MENU".equalsIgnoreCase(entry.action);
+    }
+
+    /** Sets what a click on this figure does. */
+    public void sendTo(LobbyConfig.NpcEntry entry, String server) {
+        entry.action = "SERWER";
+        entry.server = server;
+        this.changed(entry);
+    }
+
+    public void opens(LobbyConfig.NpcEntry entry, String menu) {
+        entry.action = "MENU";
+        entry.menu = menu;
+        this.changed(entry);
+    }
+
     /** The outfit under that name, or null when the file has none. */
     public LobbyConfig.NpcPreset preset(String id) {
         for (LobbyConfig.NpcPreset preset : this.config.npcs.presets) {
@@ -293,8 +311,14 @@ public final class NpcService {
             this.figure(entry, world);
             this.label(entry, world, this.nameLabels, this.config.npcs.nameOffset,
                     entry.id + ":name", entry.name);
-            this.label(entry, world, this.countLabels, this.config.npcs.countOffset,
-                    entry.id + ":count", this.countText(entry));
+
+            // Only a figure that stands for a server has a number of players to show. The one
+            // that opens the shop would have nothing to put there, and an empty line above its
+            // head is a gap rather than a label.
+            if (sendsToAServer(entry)) {
+                this.label(entry, world, this.countLabels, this.config.npcs.countOffset,
+                        entry.id + ":count", this.countText(entry));
+            }
 
             if (!entry.addon.isBlank()) {
                 this.label(entry, world, this.addonLabels, this.config.npcs.addonOffset,

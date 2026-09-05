@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import pl.landmc.lobby.config.LobbyConfig;
 import pl.landmc.lobby.config.LobbyMessages;
 import pl.landmc.lobby.npc.NpcService;
+import pl.landmc.menus.protocol.MenuKind;
 import pl.landmc.platform.paper.notice.PaperNoticeService;
 
 /**
@@ -40,6 +41,9 @@ public class NpcCommand {
 
     /** The name of the outfit argument, suggested the same way. */
     public static final String PRESET_ARGUMENT = "szablon";
+
+    /** The name of the menu argument, suggested from the menus the proxy can open. */
+    public static final String MENU_ARGUMENT = "menu";
 
     private final NpcService npcs;
     private final PaperNoticeService<LobbyMessages> notices;
@@ -184,6 +188,52 @@ public class NpcCommand {
 
         this.npcs.dressUp(entry, outfit);
         this.notices.viewer(player, messages -> messages.npcUpdated, named(entry.id));
+    }
+
+    @Execute(name = "serwer")
+    void server(
+            @Context Player player,
+            @Arg(NAME_ARGUMENT) String id,
+            @Arg("serwer") String server) {
+
+        LobbyConfig.NpcEntry entry = this.entry(player, id);
+        if (entry == null) {
+            return;
+        }
+
+        this.npcs.sendTo(entry, server);
+        this.notices.viewer(player, messages -> messages.npcUpdated, named(entry.id));
+    }
+
+    @Execute(name = "menu")
+    void menu(
+            @Context Player player,
+            @Arg(NAME_ARGUMENT) String id,
+            @Arg(MENU_ARGUMENT) String menu) {
+
+        LobbyConfig.NpcEntry entry = this.entry(player, id);
+        if (entry == null) {
+            return;
+        }
+
+        MenuKind kind = kind(menu);
+        if (kind == null) {
+            this.notices.viewer(player, messages -> messages.npcUnknownMenu, named(menu));
+            return;
+        }
+
+        this.npcs.opens(entry, kind.name());
+        this.notices.viewer(player, messages -> messages.npcUpdated, named(entry.id));
+    }
+
+    /** The menu a name asks for, or null when this build has never heard of it. */
+    private static MenuKind kind(String name) {
+        try {
+            return MenuKind.valueOf(name.toUpperCase(java.util.Locale.ROOT));
+        }
+        catch (IllegalArgumentException unknown) {
+            return null;
+        }
     }
 
     @Execute(name = "lista")
