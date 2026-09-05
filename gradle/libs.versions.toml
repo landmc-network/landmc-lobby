@@ -7,7 +7,7 @@
 
 # The menu wire format, published by landmc-menus. Only the protocol: this plugin
 # asks the proxy to open a menu, it does not draw one.
-landmc-menus = "1.10.0"
+landmc-menus = "1.12.0"
 
 # Ranks are LuckPerms groups. Optional at runtime: without it the tab list is just
 # names, which is what it was before there were ranks.
