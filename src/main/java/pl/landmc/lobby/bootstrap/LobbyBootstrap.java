@@ -2,6 +2,8 @@ package pl.landmc.lobby.bootstrap;
 
 import dev.rollczi.litecommands.LiteCommands;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 import org.bukkit.command.CommandSender;
@@ -19,6 +21,9 @@ import pl.landmc.platform.paper.command.PaperCommands;
 import pl.landmc.platform.paper.command.UnknownCommandListener;
 import pl.landmc.platform.paper.notice.PaperNoticeService;
 import pl.landmc.platform.paper.scheduler.MainThreadExecutor;
+import pl.landmc.lobby.bossbar.BossBarService;
+import pl.landmc.lobby.command.FlyCommand;
+import pl.landmc.lobby.fly.FlyService;
 import pl.landmc.lobby.command.ProfileCommand;
 import pl.landmc.lobby.command.SetSpawnCommand;
 import pl.landmc.lobby.command.SpawnCommand;
@@ -29,6 +34,7 @@ import pl.landmc.lobby.hotbar.HotbarService;
 import pl.landmc.lobby.sidebar.BalanceTracker;
 import pl.landmc.lobby.sidebar.ScoreboardService;
 import pl.landmc.lobby.listener.HotbarListener;
+import pl.landmc.lobby.listener.ArrivalListener;
 import pl.landmc.lobby.listener.ProfileListener;
 import pl.landmc.lobby.listener.ScoreboardListener;
 import pl.landmc.lobby.listener.ServerLoadedListener;
@@ -67,6 +73,7 @@ public final class LobbyBootstrap {
     private ProfileService profiles;
     private MessageBus bus;
     private LiteCommands<CommandSender> commands;
+    private BossBarService bossBar;
 
     public LobbyBootstrap(Plugin plugin, Logger logger, Path dataDirectory) {
         this.plugin = Objects.requireNonNull(plugin, "plugin");
@@ -118,18 +125,33 @@ public final class LobbyBootstrap {
         NoticeServiceProvider<CommandSender> platformNotices =
                 new AudienceNoticeService<>(this.messages.platform, formatter);
 
+        FlyService fly = new FlyService(this.config);
+
+        // A lobby with flight switched off does not answer /fly at all, rather than answering
+        // it with a refusal - the command simply is not part of that server.
+        List<Object> commands = new ArrayList<>(List.of(
+                new SpawnCommand(spawn, notices),
+                new SetSpawnCommand(spawn, notices),
+                new ProfileCommand(this.profiles, notices)));
+
+        if (fly.isEnabled()) {
+            commands.add(new FlyCommand(fly, notices));
+        }
+
         this.commands = PaperCommands.builder(this.plugin, formatter, platformNotices)
-                .commands(
-                        new SpawnCommand(spawn, notices),
-                        new SetSpawnCommand(spawn, notices),
-                        new ProfileCommand(this.profiles, notices))
+                .commands(commands.toArray())
                 .build();
-        this.logger.info("Registered 3 commands.");
+        this.logger.info("Registered {} commands.", commands.size());
+
+        this.bossBar = new BossBarService(this.config, formatter);
 
         this.plugin.getServer().getPluginManager()
                 .registerEvents(new ProfileListener(this.profiles), this.plugin);
         this.plugin.getServer().getPluginManager()
                 .registerEvents(new SpawnListener(spawn, this.plugin), this.plugin);
+        this.plugin.getServer().getPluginManager()
+                .registerEvents(
+                        new ArrivalListener(this.bossBar, fly, this.plugin), this.plugin);
         this.plugin.getServer().getPluginManager()
                 .registerEvents(new UnknownCommandListener(platformNotices), this.plugin);
 
@@ -182,6 +204,13 @@ public final class LobbyBootstrap {
         if (this.commands != null) {
             this.commands.unregister();
             this.commands = null;
+        }
+
+        // A reload leaves the old bar on screen otherwise: the players stay connected and
+        // nothing else ever tells their client the bar is gone.
+        if (this.bossBar != null) {
+            this.bossBar.hideAll(this.plugin.getServer().getOnlinePlayers());
+            this.bossBar = null;
         }
 
         if (this.profiles != null && this.database != null && this.database.isConnected()) {

@@ -27,6 +27,13 @@ public class LobbyConfig extends OkaeriConfig {
     public ScoreboardSection scoreboard = new ScoreboardSection();
 
     @Comment("")
+    public FlySection fly = new FlySection();
+
+    @Comment("")
+    @CustomKey("boss-bar")
+    public BossBarSection bossBar = new BossBarSection();
+
+    @Comment("")
     public WorldSection world = new WorldSection();
 
     @Comment("Baza danych profili lobby. H2 dziala bez zadnej konfiguracji.")
@@ -82,6 +89,49 @@ public class LobbyConfig extends OkaeriConfig {
      *     generator: landmc-lobby
      * </pre>
      */
+    public static class FlySection extends OkaeriConfig {
+
+        @Comment("Komenda /fly i latanie z rangi. Wylaczone = komendy w ogole nie ma.")
+        public boolean enabled = true;
+
+        @Comment("")
+        @Comment("Kto moze latac. Ten sam wezel sprawdza komenda i nadanie po wejsciu.")
+        public String permission = "landmc.lobby.fly";
+
+        @Comment("")
+        @Comment("Czy uprawniony gracz dostaje latanie sam po wejsciu.")
+        @Comment("Tak bylo na starym LandMC i to jest wlasnie to, za co gracz placi -")
+        @Comment("nikt nie chce wpisywac komendy przy kazdym wejsciu.")
+        @CustomKey("on-join")
+        public boolean onJoin = true;
+
+        @Comment("Po ilu tickach od wejscia. Klient, ktory jeszcze wczytuje swiat, to gubi.")
+        @CustomKey("on-join-delay-ticks")
+        public int onJoinDelayTicks = 20;
+    }
+
+    public static class BossBarSection extends OkaeriConfig {
+
+        @Comment("Pasek u gory ekranu, reklamujacy rangi - tak jak na starym LandMC.")
+        public boolean enabled = true;
+
+        @Comment("")
+        @Comment("Tresc paska. Kolory rang sa te, ktore maja grupy w LuckPermsie.")
+        public String text =
+                "<red>Rangi <dark_gray>(<yellow><bold>VIP</bold><gray>,"
+                        + " <light_purple><bold>SVIP</bold><gray>,"
+                        + " <b><#FF5555>S<#FFAA00>Z<#FFFF55>E<#55FF55>F<#55FFFF>U<#00AAAA>N"
+                        + "<#FF55FF>C<#FF5555>I<#FFAA00>O</b><dark_gray>)"
+                        + " <red>➤ <white><underlined>/rangi";
+
+        @Comment("")
+        @Comment("Kolor paska: PINK, BLUE, RED, GREEN, YELLOW, PURPLE lub WHITE.")
+        public String colour = "GREEN";
+
+        @Comment("Styl: PROGRESS (jednolity, jak w oryginale) albo NOTCHED_6/10/12/20.")
+        public String style = "PROGRESS";
+    }
+
     public static class WorldSection extends OkaeriConfig {
 
         @Comment("Swiaty traktowane jako lobby: dostaja ponizsze gamerule i punkt spawnu.")

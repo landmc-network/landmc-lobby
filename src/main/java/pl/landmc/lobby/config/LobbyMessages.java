@@ -32,6 +32,23 @@ public class LobbyMessages extends OkaeriConfig {
             Notice.chat("<red>Błąd> <gray>Spawn nie został jeszcze ustawiony. Użyj <white>/setspawn</white>.");
 
     @Comment("")
+    @Comment("Komenda /fly. Slowa te same, co na starym LandMC.")
+    @CustomKey("fly-enabled")
+    public Notice flyEnabled = Notice.chat(
+            "<green><bold>LOBBY</bold> <green>Włączono <gray>latanie dla siebie!");
+
+    @CustomKey("fly-disabled")
+    public Notice flyDisabled = Notice.chat(
+            "<green><bold>LOBBY</bold> <red>Wyłączono <gray>latanie dla siebie!");
+
+    @Comment("")
+    @Comment("Gdy gracz nie ma rangi, ktora pozwala latac.")
+    @CustomKey("fly-no-permission")
+    public Notice flyNoPermission = Notice.chat(
+            "<red>Błąd> <gray>Latanie na lobby jest dodatkiem do rangi."
+                    + " Zobacz <white>/rangi</white>.");
+
+    @Comment("")
     @Comment("Placeholdery: {NAME}, {VISITS}, {FIRST_JOIN}, {LAST_SEEN}")
     @CustomKey("profile-header")
     public Notice profileHeader = Notice.chat("<green><bold>PROFIL</bold> <gray>Profil gracza <white>{NAME}</white>:");
