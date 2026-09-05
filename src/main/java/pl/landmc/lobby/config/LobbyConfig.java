@@ -152,7 +152,7 @@ public class LobbyConfig extends OkaeriConfig {
             items.add(new HotbarItem(
                     4, "PLAYER_HEAD", true,
                     "<green>Twój profil <dark_gray>(PPM/LPM)",
-                    List.of("<gray>Sprawdź swój profil klikając."),
+                    List.of("<gray>Sprawdź swoje statystyki klikając."),
                     "PROFILE"));
             items.add(new HotbarItem(
                     8, "PAPER", false,
