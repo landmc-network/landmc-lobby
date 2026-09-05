@@ -24,6 +24,9 @@ import pl.landmc.lobby.command.SetSpawnCommand;
 import pl.landmc.lobby.command.SpawnCommand;
 import pl.landmc.lobby.config.LobbyConfig;
 import pl.landmc.lobby.config.LobbyMessages;
+import pl.landmc.lobby.hotbar.HotbarChannel;
+import pl.landmc.lobby.hotbar.HotbarService;
+import pl.landmc.lobby.listener.HotbarListener;
 import pl.landmc.lobby.listener.ProfileListener;
 import pl.landmc.lobby.listener.SpawnListener;
 import pl.landmc.lobby.messaging.LobbyMessaging;
@@ -125,6 +128,15 @@ public final class LobbyBootstrap {
                 .registerEvents(new SpawnListener(spawn, this.plugin), this.plugin);
         this.plugin.getServer().getPluginManager()
                 .registerEvents(new UnknownCommandListener(platformNotices), this.plugin);
+
+        HotbarService hotbar = new HotbarService(this.config, formatter, this.logger);
+        if (hotbar.isEnabled()) {
+            this.plugin.getServer().getPluginManager().registerEvents(
+                    new HotbarListener(hotbar, new HotbarChannel(this.plugin)), this.plugin);
+        }
+        else {
+            this.logger.info("Lobby hotbar is off; players arrive with an empty inventory.");
+        }
 
         this.startAutosave();
 

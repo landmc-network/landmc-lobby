@@ -30,6 +30,11 @@ configurations.runtimeClasspath {
 dependencies {
     compileOnly(libs.paper.api)
 
+    // The menu wire format, shared with the plugin that draws menus and with the
+    // proxy that owns them. Not relocated, for the same reason as everywhere else:
+    // a renamed package makes a stack trace from one side unreadable on the other.
+    implementation(libs.menus.api)
+
     implementation(libs.platform.api)
     implementation(libs.platform.common)
     implementation(libs.platform.config)

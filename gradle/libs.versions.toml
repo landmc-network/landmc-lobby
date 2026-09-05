@@ -5,7 +5,11 @@
 # decided once, in landmc-platform's catalog.
 [versions]
 
-landmc-platform = "1.2.0"
+# The menu wire format, published by landmc-menus. Only the protocol: this plugin
+# asks the proxy to open a menu, it does not draw one.
+landmc-menus = "1.2.1"
+
+landmc-platform = "1.4.0"
 
 # Paper 26.2 publishes Java 25 bytecode, which is why this project compiles with --release 25.
 paper = "26.2.build.121-stable"
@@ -26,6 +30,7 @@ slf4j = "2.0.17"
 [libraries]
 paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper" }
 
+menus-api = { module = "pl.landmc:menus-api", version.ref = "landmc-menus" }
 platform-api = { module = "pl.landmc:platform-api", version.ref = "landmc-platform" }
 platform-common = { module = "pl.landmc:platform-common", version.ref = "landmc-platform" }
 platform-config = { module = "pl.landmc:platform-config", version.ref = "landmc-platform" }

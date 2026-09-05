@@ -21,6 +21,9 @@ public class LobbyConfig extends OkaeriConfig {
     public SpawnSection spawn = new SpawnSection();
 
     @Comment("")
+    public HotbarSection hotbar = new HotbarSection();
+
+    @Comment("")
     public WorldSection world = new WorldSection();
 
     @Comment("Baza danych profili lobby. H2 dziala bez zadnej konfiguracji.")
@@ -112,5 +115,89 @@ public class LobbyConfig extends OkaeriConfig {
         public boolean enabled = true;
 
         public RedisConfig redis = new RedisConfig();
+    }
+
+    /** What a player is holding on the lobby, and what each item opens. */
+    public static class HotbarSection extends OkaeriConfig {
+
+        @Comment("Czy gracz po wejsciu dostaje ekwipunek lobby.")
+        public boolean enabled = true;
+
+        @Comment("")
+        @Comment("Ktory slot jest zaznaczony po wejsciu.")
+        @CustomKey("selected-slot")
+        public int selectedSlot = 0;
+
+        @Comment("")
+        @Comment("Przedmioty. Sloty 0-8 to hotbar, tak jak w oryginale: kompas na 0,")
+        @Comment("sklep na 2, glowa gracza na 4. Slot 8 mial /podserwery, ktorych ta siec")
+        @Comment("jeszcze nie ma - dopisz go tutaj, kiedy beda.")
+        public List<HotbarItem> items = defaultItems();
+
+        private static List<HotbarItem> defaultItems() {
+            List<HotbarItem> items = new ArrayList<>();
+            items.add(new HotbarItem(
+                    0, "COMPASS", false,
+                    "<green>Wybierz serwer <dark_gray>(PPM/LPM)",
+                    List.of("<gray>Wybierz jeden z serwerów, aby ...",
+                            "<gray>... się na niego przenieść."),
+                    "SERVERS"));
+            items.add(new HotbarItem(
+                    2, "EMERALD", false,
+                    "<green>Sklep premium <dark_gray>(PPM/LPM)",
+                    List.of("<gray>Zakup rangę lub inne rzeczy za diamenty!"),
+                    "SHOP"));
+            items.add(new HotbarItem(
+                    4, "PLAYER_HEAD", true,
+                    "<green>Twój profil <dark_gray>(PPM/LPM)",
+                    List.of("<gray>Sprawdź swój profil klikając."),
+                    "PROFILE"));
+            return items;
+        }
+    }
+
+    /** One item on the lobby hotbar. */
+    public static class HotbarItem extends OkaeriConfig {
+
+        @Comment("Slot ekwipunku, liczony od zera. Hotbar to 0-8.")
+        public int slot = 0;
+
+        @Comment("Material przedmiotu.")
+        public String material = "PAPER";
+
+        @Comment("Czy to ma byc glowa gracza, ktory go trzyma.")
+        @CustomKey("player-head")
+        public boolean playerHead = false;
+
+        @Comment("Nazwa przedmiotu. MiniMessage.")
+        public String name = "";
+
+        public List<String> lore = new ArrayList<>();
+
+        @Comment("Menu otwierane po kliknieciu: SERVERS, PROFILE albo SHOP.")
+        @Comment("Puste = przedmiot nic nie robi.")
+        @Comment("To nazwa menu, a nie komenda: lobby prosi proxy o otwarcie jednego ze")
+        @Comment("znanych menu, zamiast wysylac mu komende do wykonania.")
+        public String menu = "";
+
+        /** Required by Okaeri. */
+        public HotbarItem() {
+        }
+
+        public HotbarItem(
+                int slot,
+                String material,
+                boolean playerHead,
+                String name,
+                List<String> lore,
+                String menu) {
+
+            this.slot = slot;
+            this.material = material;
+            this.playerHead = playerHead;
+            this.name = name;
+            this.lore = new ArrayList<>(lore);
+            this.menu = menu;
+        }
     }
 }
