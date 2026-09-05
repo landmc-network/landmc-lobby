@@ -16,6 +16,7 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import pl.landmc.lobby.config.LobbyConfig;
+import pl.landmc.lobby.profile.ProfileService;
 import pl.landmc.platform.component.ComponentFormatter;
 
 /**
@@ -45,6 +46,7 @@ public final class ScoreboardService {
 
     private final LobbyConfig config;
     private final BalanceTracker balances;
+    private final ProfileService profiles;
     private final ComponentFormatter formatter;
     private final UiText ui;
 
@@ -58,10 +60,14 @@ public final class ScoreboardService {
     private final Map<UUID, Scoreboard> boards = new HashMap<>();
 
     public ScoreboardService(
-            LobbyConfig config, BalanceTracker balances, ComponentFormatter formatter) {
+            LobbyConfig config,
+            BalanceTracker balances,
+            ProfileService profiles,
+            ComponentFormatter formatter) {
 
         this.config = Objects.requireNonNull(config, "config");
         this.balances = Objects.requireNonNull(balances, "balances");
+        this.profiles = Objects.requireNonNull(profiles, "profiles");
         this.formatter = Objects.requireNonNull(formatter, "formatter");
         this.ui = new UiText(config.ui, formatter);
         this.dynamic = dynamicLines(config.scoreboard.lines);
@@ -141,8 +147,9 @@ public final class ScoreboardService {
                 .replace("{DIAMONDS}", Long.toString(this.balances.balanceOf(player.getUniqueId())))
                 // Neither of these has a system behind it yet. They are written as zero rather
                 // than left as raw placeholders, and the config says what they are waiting for.
-                .replace("{COINS}", "0")
-                .replace("{LEVEL}", "0");
+                .replace("{COINS}", Long.toString(
+                        this.balances.coinsOf(player.getUniqueId())))
+                .replace("{LEVEL}", Integer.toString(this.levelOf(player)));
 
         return this.formatter.format(this.ui.render(text));
     }
@@ -159,5 +166,19 @@ public final class ScoreboardService {
             }
         }
         return List.copyOf(dynamic);
+    }
+
+    /**
+     * Their level, from how often they have arrived.
+     *
+     * <p>Read from the profile the lobby already keeps rather than from a counter of its own.
+     * A player whose profile has not finished loading is level nought for a moment, which is
+     * what they were a second earlier anyway.
+     */
+    private int levelOf(Player player) {
+        return this.profiles.find(player.getUniqueId())
+                .map(profile -> LobbyLevel.of(
+                        profile.visits(), this.config.level.visitsPerLevel))
+                .orElse(0);
     }
 }

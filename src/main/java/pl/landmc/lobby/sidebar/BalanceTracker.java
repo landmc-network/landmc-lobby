@@ -36,6 +36,7 @@ public final class BalanceTracker implements PluginMessageListener {
 
     /** Concurrent because plugin messages and the scoreboard task are not the same thread. */
     private final Map<UUID, Long> balances = new ConcurrentHashMap<>();
+    private final Map<UUID, Long> coins = new ConcurrentHashMap<>();
 
     public BalanceTracker(Plugin plugin, Logger logger) {
         Objects.requireNonNull(plugin, "plugin");
@@ -53,8 +54,13 @@ public final class BalanceTracker implements PluginMessageListener {
         return this.balances.getOrDefault(playerId, 0L);
     }
 
+    public long coinsOf(UUID playerId) {
+        return this.coins.getOrDefault(playerId, 0L);
+    }
+
     public void forget(UUID playerId) {
         this.balances.remove(playerId);
+        this.coins.remove(playerId);
     }
 
     @Override
@@ -63,9 +69,9 @@ public final class BalanceTracker implements PluginMessageListener {
             return;
         }
 
-        long balance;
+        SidebarProtocol.Balances balances;
         try {
-            balance = SidebarProtocol.decodeBalance(message);
+            balances = SidebarProtocol.decode(message);
         }
         catch (MenuProtocolException exception) {
             // Debug, not warn: this channel is reachable by a modified client, and a log line
@@ -75,7 +81,8 @@ public final class BalanceTracker implements PluginMessageListener {
             return;
         }
 
-        this.balances.put(player.getUniqueId(), balance);
+        this.balances.put(player.getUniqueId(), balances.diamonds());
+        this.coins.put(player.getUniqueId(), balances.coins());
         this.onChanged.accept(player);
     }
 

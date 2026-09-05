@@ -142,7 +142,8 @@ public final class LobbyBootstrap {
         // is registered before the board is started. The board is handed the same tracker.
         BalanceTracker balances = new BalanceTracker(this.plugin, this.logger);
         this.bossBar = new BossBarService(
-                this.config, formatter, new UiText(this.config.ui, formatter), balances);
+                this.config, formatter, new UiText(this.config.ui, formatter), balances,
+                this.profiles);
 
         // A lobby with flight switched off does not answer /fly at all, rather than answering
         // it with a refusal - the command simply is not part of that server.
@@ -338,7 +339,7 @@ public final class LobbyBootstrap {
      * many people are online.
      */
     private void startScoreboards(ComponentFormatter formatter, BalanceTracker balances) {
-        ScoreboardService scoreboards = new ScoreboardService(this.config, balances, formatter);
+        ScoreboardService scoreboards = new ScoreboardService(this.config, balances, this.profiles, formatter);
 
         balances.onChanged(player -> {
             scoreboards.refresh(player);

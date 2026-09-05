@@ -40,6 +40,9 @@ public class LobbyConfig extends OkaeriConfig {
     public NpcSection npcs = new NpcSection();
 
     @Comment("")
+    public LevelSection level = new LevelSection();
+
+    @Comment("")
     public ProtectionSection protection = new ProtectionSection();
 
     @Comment("")
@@ -371,6 +374,21 @@ public class LobbyConfig extends OkaeriConfig {
         @Comment("")
         @Comment("Dzwiek wyrzutu. Pusty = bez dzwieku.")
         public String sound = "ENTITY_ENDER_DRAGON_SHOOT";
+    }
+
+    /**
+     * Poziom gracza, liczony z liczby wejsc.
+     *
+     * <p>Bez osobnego licznika expa: siec i tak wie, ile razy ktos wrocil, a poziom czytany
+     * z czegos, co juz jest prawda, nie ma jak sie z tym rozjechac. Stary serwer mial na
+     * scoreboardzie zero wpisane na sztywno.
+     */
+    public static class LevelSection extends OkaeriConfig {
+
+        @Comment("Ile wejsc kosztuje pierwszy poziom. Kazdy nastepny kosztuje o tyle wiecej:")
+        @Comment("przy piatce poziom 1 wypada na piatym wejsciu, 2 na pietnastym, 3 na trzydziestym.")
+        @CustomKey("visits-per-level")
+        public int visitsPerLevel = 5;
     }
 
     public static class LobbySection extends OkaeriConfig {

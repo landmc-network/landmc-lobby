@@ -11,6 +11,8 @@ import net.kyori.adventure.bossbar.BossBar;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import pl.landmc.lobby.config.LobbyConfig;
+import pl.landmc.lobby.profile.ProfileService;
+import pl.landmc.lobby.sidebar.LobbyLevel;
 import pl.landmc.lobby.sidebar.BalanceTracker;
 import pl.landmc.lobby.sidebar.UiText;
 import pl.landmc.platform.component.ComponentFormatter;
@@ -37,6 +39,7 @@ public final class BossBarService {
     private final ComponentFormatter formatter;
     private final UiText ui;
     private final BalanceTracker balances;
+    private final ProfileService profiles;
 
     /** Each player's bars, in the order they are drawn. */
     private final Map<UUID, List<BossBar>> bars = new HashMap<>();
@@ -48,12 +51,14 @@ public final class BossBarService {
             LobbyConfig config,
             ComponentFormatter formatter,
             UiText ui,
-            BalanceTracker balances) {
+            BalanceTracker balances,
+            ProfileService profiles) {
 
         this.config = Objects.requireNonNull(config, "config");
         this.formatter = Objects.requireNonNull(formatter, "formatter");
         this.ui = Objects.requireNonNull(ui, "ui");
         this.balances = Objects.requireNonNull(balances, "balances");
+        this.profiles = Objects.requireNonNull(profiles, "profiles");
     }
 
     public boolean isEnabled() {
@@ -138,8 +143,9 @@ public final class BossBarService {
                 .replace("{ONLINE}", Integer.toString(Bukkit.getOnlinePlayers().size()))
                 .replace("{DIAMONDS}", Long.toString(this.balances.balanceOf(player.getUniqueId())))
                 // Neither has a system behind it yet, and the board says the same about them.
-                .replace("{COINS}", "0")
-                .replace("{LEVEL}", "0");
+                .replace("{COINS}", Long.toString(
+                        this.balances.coinsOf(player.getUniqueId())))
+                .replace("{LEVEL}", Integer.toString(this.levelOf(player)));
 
         return this.ui.render(text, this.config.bossBar.lineWidth);
     }
@@ -162,5 +168,19 @@ public final class BossBarService {
             // The original's SOLID: one unbroken bar, no notches.
             return BossBar.Overlay.PROGRESS;
         }
+    }
+
+    /**
+     * Their level, from how often they have arrived.
+     *
+     * <p>Read from the profile the lobby already keeps rather than from a counter of its own.
+     * A player whose profile has not finished loading is level nought for a moment, which is
+     * what they were a second earlier anyway.
+     */
+    private int levelOf(Player player) {
+        return this.profiles.find(player.getUniqueId())
+                .map(profile -> LobbyLevel.of(
+                        profile.visits(), this.config.level.visitsPerLevel))
+                .orElse(0);
     }
 }
