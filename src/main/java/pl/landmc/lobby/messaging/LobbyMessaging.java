@@ -39,7 +39,8 @@ public final class LobbyMessaging {
 
         MessageRegistry registry = new MessageRegistry()
                 .register(PingMessage.TYPE, PingMessage.class)
-                .register(PongMessage.TYPE, PongMessage.class);
+                .register(PongMessage.TYPE, PongMessage.class)
+                .register(ServerCountsMessage.TYPE, ServerCountsMessage.class);
 
         MessageSerializer serializer = new MessageSerializer(registry);
         MessageTransport transport = transport(config, serverId, serializer, logger);

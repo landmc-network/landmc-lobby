@@ -49,6 +49,47 @@ public class LobbyMessages extends OkaeriConfig {
                     + " Zobacz <white>/rangi</white>.");
 
     @Comment("")
+    @Comment("Komenda /npc - figurki trybow na spawnie. Placeholder {ID} to nazwa figurki.")
+    @CustomKey("npc-created")
+    public Notice npcCreated = Notice.chat(
+            "<green><bold>LOBBY</bold> <gray>Postawiono figurkę <white>{ID}</white> w tym miejscu.");
+
+    @CustomKey("npc-removed")
+    public Notice npcRemoved = Notice.chat(
+            "<green><bold>LOBBY</bold> <gray>Usunięto figurkę <white>{ID}</white>.");
+
+    @CustomKey("npc-moved")
+    public Notice npcMoved = Notice.chat(
+            "<green><bold>LOBBY</bold> <gray>Przeniesiono figurkę <white>{ID}</white> w to miejsce.");
+
+    @CustomKey("npc-updated")
+    public Notice npcUpdated = Notice.chat(
+            "<green><bold>LOBBY</bold> <gray>Zmieniono figurkę <white>{ID}</white>.");
+
+    @CustomKey("npc-list-header")
+    public Notice npcListHeader = Notice.chat(
+            "<green><bold>LOBBY</bold> <gray>Postawione figurki (<white>{COUNT}</white>):");
+
+    @CustomKey("npc-list-entry")
+    public Notice npcListEntry = Notice.chat(
+            "<dark_gray>» <white>{ID} <gray>→ <white>{SERVER} <dark_gray>(<gray>{WORLD}"
+                    + " <dark_gray>| <gray>{X}, {Y}, {Z}<dark_gray>)");
+
+    @CustomKey("npc-list-empty")
+    public Notice npcListEmpty = Notice.chat(
+            "<red>Błąd> <gray>Nie ma jeszcze żadnej figurki."
+                    + " Postaw pierwszą: <white>/npc utworz <nazwa> <serwer> <napis></white>.");
+
+    @CustomKey("npc-unknown")
+    public Notice npcUnknown = Notice.chat(
+            "<red>Błąd> <gray>Nie ma figurki o nazwie <white>{ID}</white>.");
+
+    @CustomKey("npc-exists")
+    public Notice npcExists = Notice.chat(
+            "<red>Błąd> <gray>Figurka <white>{ID}</white> już stoi."
+                    + " Przenieś ją: <white>/npc tutaj {ID}</white>.");
+
+    @Comment("")
     @Comment("Placeholdery: {NAME}, {VISITS}, {FIRST_JOIN}, {LAST_SEEN}")
     @CustomKey("profile-header")
     public Notice profileHeader = Notice.chat("<green><bold>PROFIL</bold> <gray>Profil gracza <white>{NAME}</white>:");

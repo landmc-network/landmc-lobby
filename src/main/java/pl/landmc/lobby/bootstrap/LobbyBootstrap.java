@@ -1,6 +1,8 @@
 package pl.landmc.lobby.bootstrap;
 
 import dev.rollczi.litecommands.LiteCommands;
+import dev.rollczi.litecommands.argument.ArgumentKey;
+import dev.rollczi.litecommands.suggestion.SuggestionResult;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,12 +26,17 @@ import pl.landmc.platform.paper.scheduler.MainThreadExecutor;
 import pl.landmc.lobby.bossbar.BossBarService;
 import pl.landmc.lobby.command.FlyCommand;
 import pl.landmc.lobby.fly.FlyService;
+import pl.landmc.lobby.command.NpcCommand;
 import pl.landmc.lobby.command.ProfileCommand;
 import pl.landmc.lobby.command.SetSpawnCommand;
 import pl.landmc.lobby.command.SpawnCommand;
 import pl.landmc.lobby.config.LobbyConfig;
+import pl.landmc.lobby.listener.NpcListener;
+import pl.landmc.lobby.menu.MenuChannel;
+import pl.landmc.lobby.messaging.ServerCountsMessage;
+import pl.landmc.lobby.npc.NpcService;
+import pl.landmc.lobby.npc.ServerCounts;
 import pl.landmc.lobby.config.LobbyMessages;
-import pl.landmc.lobby.hotbar.HotbarChannel;
 import pl.landmc.lobby.hotbar.HotbarService;
 import pl.landmc.lobby.sidebar.BalanceTracker;
 import pl.landmc.lobby.sidebar.ScoreboardService;
@@ -73,6 +80,7 @@ public final class LobbyBootstrap {
     private DatabaseService database;
     private ProfileService profiles;
     private MessageBus bus;
+    private NpcService npcs;
     private LiteCommands<CommandSender> commands;
     private BossBarService bossBar;
 
@@ -136,16 +144,34 @@ public final class LobbyBootstrap {
 
         // A lobby with flight switched off does not answer /fly at all, rather than answering
         // it with a refusal - the command simply is not part of that server.
+        // One pipe to the proxy, shared: the hotbar asks it to open menus and the figures
+        // on the spawn ask it to move somebody to another server.
+        MenuChannel menuChannel = new MenuChannel(this.plugin);
+
+        ServerCounts serverCounts = new ServerCounts();
+        this.npcs = new NpcService(
+                this.plugin, this.config, this.configs, formatter, serverCounts);
+        this.npcs.start();
+
         List<Object> commands = new ArrayList<>(List.of(
                 new SpawnCommand(spawn, notices),
                 new SetSpawnCommand(spawn, notices),
-                new ProfileCommand(this.profiles, notices)));
+                new ProfileCommand(this.profiles, notices),
+                new NpcCommand(this.npcs, notices)));
 
         if (fly.isEnabled()) {
             commands.add(new FlyCommand(fly, notices));
         }
 
         this.commands = PaperCommands.builder(this.plugin, formatter, platformNotices)
+                // Tab on a figure argument offers the figures that are standing, not the word
+                // "npc". Somebody who has to remember the names has to keep the file open
+                // beside the game.
+                .argumentSuggester(
+                        String.class,
+                        ArgumentKey.of(NpcCommand.NAME_ARGUMENT),
+                        (invocation, argument, context) ->
+                                SuggestionResult.of(this.npcs.ids()))
                 .commands(commands.toArray())
                 .build();
         this.logger.info("Registered {} commands.", commands.size());
@@ -164,10 +190,25 @@ public final class LobbyBootstrap {
 
         this.startScoreboards(formatter, balances);
 
+        if (this.npcs.isEnabled()) {
+            this.plugin.getServer().getPluginManager().registerEvents(
+                    new NpcListener(this.npcs, menuChannel, this.config), this.plugin);
+
+            // Only the proxy can count the people on another server, so the figures are told
+            // rather than left to guess. Remembered on the messaging thread and read on the
+            // main one, which is why the holder swaps a whole map rather than editing one.
+            this.bus.subscribe(
+                    ServerCountsMessage.class,
+                    (message, context) -> serverCounts.accept(message));
+        }
+        else {
+            this.logger.info("Lobby NPCs are off; the spawn has no server figures.");
+        }
+
         HotbarService hotbar = new HotbarService(this.config, formatter, this.logger);
         if (hotbar.isEnabled()) {
             this.plugin.getServer().getPluginManager().registerEvents(
-                    new HotbarListener(hotbar, new HotbarChannel(this.plugin)), this.plugin);
+                    new HotbarListener(hotbar, menuChannel), this.plugin);
         }
         else {
             this.logger.info("Lobby hotbar is off; players arrive with an empty inventory.");
@@ -211,6 +252,13 @@ public final class LobbyBootstrap {
         if (this.commands != null) {
             this.commands.unregister();
             this.commands = null;
+        }
+
+        // Before the bus goes. A figure left standing after a reload is one the next start
+        // puts up again beside it.
+        if (this.npcs != null) {
+            this.npcs.stop();
+            this.npcs = null;
         }
 
         // A reload leaves the old bar on screen otherwise: the players stay connected and

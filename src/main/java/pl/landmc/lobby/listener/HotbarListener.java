@@ -11,7 +11,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import pl.landmc.lobby.hotbar.HotbarChannel;
+import pl.landmc.lobby.menu.MenuChannel;
 import pl.landmc.lobby.hotbar.HotbarService;
 
 /**
@@ -24,9 +24,9 @@ import pl.landmc.lobby.hotbar.HotbarService;
 public final class HotbarListener implements Listener {
 
     private final HotbarService hotbar;
-    private final HotbarChannel channel;
+    private final MenuChannel channel;
 
-    public HotbarListener(HotbarService hotbar, HotbarChannel channel) {
+    public HotbarListener(HotbarService hotbar, MenuChannel channel) {
         this.hotbar = Objects.requireNonNull(hotbar, "hotbar");
         this.channel = Objects.requireNonNull(channel, "channel");
     }

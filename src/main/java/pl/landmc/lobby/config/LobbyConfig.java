@@ -37,12 +37,145 @@ public class LobbyConfig extends OkaeriConfig {
     public BossBarSection bossBar = new BossBarSection();
 
     @Comment("")
+    public NpcSection npcs = new NpcSection();
+
+    @Comment("")
     public WorldSection world = new WorldSection();
 
     @Comment("Baza danych profili lobby. H2 dziala bez zadnej konfiguracji.")
     public DatabaseConfig database = new DatabaseConfig();
 
     public MessagingSection messaging = new MessagingSection();
+
+    /**
+     * The figures on the spawn, one per game mode.
+     *
+     * <p>The list starts empty. A figure is mostly a position and a facing, and no default can
+     * be right on a map nobody has built yet - so they are placed with {@code /npc utworz},
+     * standing where the figure should stand and looking the way it should look, and this file
+     * is written from there.
+     */
+    public static class NpcSection extends OkaeriConfig {
+
+        @Comment("Czy figurki serwerow stoja na tym lobby.")
+        public boolean enabled = true;
+
+        @Comment("")
+        @Comment("Co ile tickow odswiezany jest licznik i mruganie. Czterdziesci tickow to dwie")
+        @Comment("sekundy - tyle samo, co na starym LandMC.")
+        @CustomKey("refresh-ticks")
+        public long refreshTicks = 40L;
+
+        @Comment("")
+        @Comment("Ile nad figurka wisi licznik graczy i tekst zachety, w blokach.")
+        @Comment("Wartosci ze starego LandMC to 2.25 i 2.5; tam byly to armor standy,")
+        @Comment("wiec napis siedzial nieco inaczej i moze wymagac paru setnych korekty.")
+        @CustomKey("count-offset")
+        public double countOffset = 2.25D;
+
+        @CustomKey("addon-offset")
+        public double addonOffset = 2.55D;
+
+        @Comment("")
+        @Comment("Napis z liczba graczy. {ONLINE} to liczba z TAMTEGO serwera, nie z lobby -")
+        @Comment("przysyla ja proxy, bo backend nie widzi nikogo poza swoimi graczami.")
+        @CustomKey("count-format")
+        public String countFormat = "<yellow>{ONLINE} graczy";
+
+        @Comment("Zanim przyjdzie pierwsza wiadomosc od proxy. Nie zero: tryb, na ktorym")
+        @Comment("nikogo nie ma, i tryb, o ktorym jeszcze nie slyszelismy, to co innego.")
+        @CustomKey("count-unknown")
+        public String countUnknown = "<gray>...";
+
+        @Comment("Gdy proxy mowi, ze serwer nie odpowiada.")
+        @CustomKey("count-offline")
+        public String countOffline = "<dark_red>Niedostępny";
+
+        @Comment("")
+        @Comment("Tekst zachety mruga - stary serwer przelaczal go miedzy czerwonym a bialym")
+        @Comment("co dwie sekundy. Kolory sa tutaj, sam tekst przy figurce.")
+        @CustomKey("addon-colours")
+        public List<String> addonColours = new ArrayList<>(List.of("<red>", "<white>"));
+
+        @Comment("")
+        @Comment("Tekst zachety dla nowo postawionej figurki.")
+        @CustomKey("default-addon")
+        public String defaultAddon = "Kliknij, aby dołączyć";
+
+        @Comment("")
+        @Comment("Czy wejscie na blok figurki tez przenosi na serwer, tak jak na starym LandMC.")
+        @Comment("Klikniecie dziala zawsze.")
+        @CustomKey("walk-in")
+        public boolean walkIn = true;
+
+        @Comment("")
+        @Comment("Przezroczystosc tla pod napisami, 0-255. Zero to sam tekst, jak nad glowa")
+        @Comment("gracza - i tak wygladalo to na starym serwerze.")
+        @CustomKey("background-opacity")
+        public int backgroundOpacity = 0;
+
+        @Comment("")
+        @Comment("Z jakiej odleglosci widac napisy, jako mnoznik zasiegu domyslnego.")
+        @CustomKey("view-range")
+        public double viewRange = 1.0D;
+
+        @Comment("")
+        @Comment("Postawione figurki. Pisze to /npc, recznie zwykle nie trzeba tu zagladac.")
+        public List<NpcEntry> list = new ArrayList<>();
+    }
+
+    /** One figure: where it stands, what it is called and where it sends you. */
+    public static class NpcEntry extends OkaeriConfig {
+
+        @Comment("Nazwa uzywana w komendach.")
+        public String id = "";
+
+        @Comment("Serwer, na ktory przenosi. Ta sama nazwa, co w konfiguracji proxy.")
+        public String server = "";
+
+        @Comment("Napis nad figurka i tekst zachety pod nim. MiniMessage;")
+        @Comment("kolor zachety nadaja addon-colours, wiec tutaj sam tekst.")
+        public String name = "";
+
+        public String addon = "";
+
+        @Comment("")
+        public String world = "world";
+
+        public double x = 0.0D;
+        public double y = 0.0D;
+        public double z = 0.0D;
+
+        @Comment("W ktora strone patrzy.")
+        public float yaw = 0.0F;
+
+        @Comment("")
+        @Comment("Adres tekstury glowy. Puste = zwykla glowa gracza.")
+        public String skin = "";
+
+        @Comment("Kolor skorzanej zbroi, szesnastkowo. Puste = zbroja bez barwienia.")
+        @CustomKey("armour-colour")
+        public String armourColour = "";
+
+        @Comment("Przedmiot w rece. Puste = pusta reka.")
+        public String item = "";
+
+        @Comment("")
+        @Comment("Pozy, po trzy stopnie: obrot wokol X, Y i Z. Pusta lista = poza domyslna.")
+        @Comment("Latwiej ustawic je patrzac na figurke niz licząc - stary serwer mial je")
+        @Comment("wpisane w kod i dochodzil do nich tak samo.")
+        @CustomKey("left-arm")
+        public List<Double> leftArm = new ArrayList<>();
+
+        @CustomKey("right-arm")
+        public List<Double> rightArm = new ArrayList<>();
+
+        @CustomKey("left-leg")
+        public List<Double> leftLeg = new ArrayList<>();
+
+        @CustomKey("right-leg")
+        public List<Double> rightLeg = new ArrayList<>();
+    }
 
     public static class LobbySection extends OkaeriConfig {
 
