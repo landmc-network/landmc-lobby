@@ -201,9 +201,15 @@ public class LobbyConfig extends OkaeriConfig {
                 // contents, then moved to where the next one starts - which is what {AT:...}
                 // is for. Three of 56 with four pixels between them comes to 176, the width of
                 // the row below.
-                "{PANEL:chip}{AT:6}{PANEL:icon_gems}{AT:22}<aqua>{DIAMONDS}"
-                        + "{AT:64}{PANEL:chip}{AT:70}{PANEL:icon_coins}{AT:86}<gold>{COINS}"
-                        + "{AT:128}{PANEL:chip}{AT:134}{PANEL:icon_star}{AT:150}<yellow>{LEVEL}",
+                // Every icon is wrapped in <white>. A bitmap glyph is multiplied by the colour
+                // in force where it sits, so an icon that inherits the colour of the value
+                // before it comes out tinted - the coins took the diamonds' aqua and the star
+                // took the coins' gold. White is the one colour that leaves a texture alone.
+                "{PANEL:chip}{AT:6}<white>{PANEL:icon_gems}{AT:22}<aqua>{DIAMONDS}"
+                        + "{AT:64}{PANEL:chip}{AT:70}<white>{PANEL:icon_coins}"
+                        + "{AT:86}<gold>{COINS}"
+                        + "{AT:128}{PANEL:chip}{AT:134}<white>{PANEL:icon_star}"
+                        + "{AT:150}<yellow>{LEVEL}",
                 // The old server wrapped these names in "Rangi (...)". The wrapper is what was
                 // dropped to bring the tile down to 180: the names still say what they are and
                 // the arrow still says what to do about it.
