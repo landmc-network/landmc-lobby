@@ -173,7 +173,9 @@ public class LobbyConfig extends OkaeriConfig {
 
         @Comment("")
         @Comment("Kolor paska: PINK, BLUE, RED, GREEN, YELLOW, PURPLE lub WHITE.")
-        public String colour = "GREEN";
+        @Comment("Musi byc ten, ktorego tekstury zeruje paczka - inaczej pod napisem zostanie")
+        @Comment("widoczny pasek. Zerowany jest jeden kolor, zeby zwykly boss dalej mial swoj.")
+        public String colour = "BLUE";
 
         @Comment("Styl: PROGRESS (jednolity, jak w oryginale) albo NOTCHED_6/10/12/20.")
         public String style = "PROGRESS";
