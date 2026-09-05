@@ -147,8 +147,8 @@ public class LobbyConfig extends OkaeriConfig {
                 Map.entry("sidebar_head", 132),
                 Map.entry("sidebar_body", 132),
                 Map.entry("sidebar_foot", 132),
-                Map.entry("chip", 64),
-                Map.entry("chip_wide", 220),
+                Map.entry("chip", 52),
+                Map.entry("chip_wide", 180),
                 Map.entry("icon_time", 13),
                 Map.entry("icon_gems", 13),
                 Map.entry("icon_coins", 13),
@@ -202,22 +202,25 @@ public class LobbyConfig extends OkaeriConfig {
                 // is for. Three of 56 with four pixels between them comes to 176, the width of
                 // the row below.
                 "{PANEL:chip}{AT:6}{PANEL:icon_gems}{AT:22}<aqua>{DIAMONDS}"
-                        + "{AT:78}{PANEL:chip}{AT:84}{PANEL:icon_coins}{AT:100}<gold>{COINS}"
-                        + "{AT:156}{PANEL:chip}{AT:162}{PANEL:icon_star}{AT:178}<yellow>{LEVEL}",
-                "{PANEL:chip_wide}{AT:8}<red>Rangi <dark_gray>("
+                        + "{AT:64}{PANEL:chip}{AT:70}{PANEL:icon_coins}{AT:86}<gold>{COINS}"
+                        + "{AT:128}{PANEL:chip}{AT:134}{PANEL:icon_star}{AT:150}<yellow>{LEVEL}",
+                // The old server wrapped these names in "Rangi (...)". The wrapper is what was
+                // dropped to bring the tile down to 180: the names still say what they are and
+                // the arrow still says what to do about it.
+                "{PANEL:chip_wide}{AT:8}"
                         + "<yellow><bold>VIP</bold><gray>, <light_purple><bold>SVIP</bold><gray>,"
                         + " <b><#FF5555>S<#FFAA00>Z<#FFFF55>E<#55FF55>F<#55FFFF>U<#00AAAA>N"
-                        + "<#FF55FF>C<#FF5555>I<#FFAA00>O</b><dark_gray>)"
+                        + "<#FF55FF>C<#FF5555>I<#FFAA00>O</b>"
                         + " <red>➤ <white><underlined>/rangi"));
 
         @Comment("")
         @Comment("Szerokosc, do ktorej dopychany jest kazdy wiersz paska.")
         @Comment("Tytul bossbara jest wysrodkowany, wiec rowna szerokosc to jedyne, co ustawia")
         @Comment("wiersze w pionie wzgledem siebie - inaczej kazdy centruje sie osobno.")
-        @Comment("Rowna sie szerokosci rzedu kafelkow: trzy po 64 z czternastoma przerwami")
+        @Comment("Rowna sie szerokosci rzedu kafelkow: trzy po 52 z dwunastoma przerwami")
         @Comment("miedzy nimi, czyli tyle samo, co szeroki kafelek pod spodem.")
         @CustomKey("line-width")
-        public int lineWidth = 220;
+        public int lineWidth = 180;
 
         @Comment("")
         @Comment("Kolor paska: PINK, BLUE, RED, GREEN, YELLOW, PURPLE lub WHITE.")
