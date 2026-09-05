@@ -255,18 +255,16 @@ public class LobbyConfig extends OkaeriConfig {
         @Comment("")
         @Comment("Naglowek nad lista. Pusta lista = bez naglowka.")
         @Comment("Placeholdery: {PLAYER}, {SERVER}, {ONLINE}")
-        @Comment("Starego LandMC to nie mialo - dodane pozniej, na zyczenie.")
+        @Comment("Tresc ze starego LandMC, ktory wysylal to pakietem przy logowaniu.")
         public List<String> header = new ArrayList<>(List.of(
-                "",
-                "<green><bold>LANDMC.PL",
+                "<green>Grasz na serwerze <white><bold>landmc.pl</bold><green>.",
                 ""));
 
         @Comment("")
         @Comment("Stopka pod lista. Pusta lista = bez stopki.")
         public List<String> footer = new ArrayList<>(List.of(
                 "",
-                "<gray>Graczy online: <white>{ONLINE}",
-                "<gray>Sklep: <green>landmc.pl",
-                ""));
+                "<green>Zachęcamy do zakupów przedmiotów premium pod"
+                        + " <yellow><bold>/sklep</bold><green>."));
     }
 }

@@ -158,9 +158,17 @@ public final class LobbyBootstrap {
                         new WorldSetup(this.plugin.getServer(), this.config, this.logger)),
                 this.plugin);
 
-        if (!spawn.isSet()) {
-            this.logger.warn("Lobby spawn is not set - use /setspawn to configure it.");
-        }
+        // Checked once the worlds exist. Asking during enable always answered "not set",
+        // because this plugin is enabled at STARTUP and the server has loaded no world yet -
+        // so it warned on every start, whatever the config said.
+        this.plugin.getServer().getPluginManager().registerEvents(
+                new ServerLoadedListener(() -> {
+                    if (!spawn.isSet()) {
+                        this.logger.warn(
+                                "Lobby spawn is not set - use /setspawn to configure it.");
+                    }
+                }),
+                this.plugin);
 
         this.logger.info("LandMC Lobby ready ({} ms).", System.currentTimeMillis() - startedAt);
     }

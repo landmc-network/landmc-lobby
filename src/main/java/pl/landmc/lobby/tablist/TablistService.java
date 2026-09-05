@@ -13,9 +13,11 @@ import pl.landmc.platform.component.ComponentFormatter;
 /**
  * How the tab list reads.
  *
- * <p>The name itself is what the old server did and no more: the rank's prefix followed by the
- * player's name, so the list says who is here and what they are. The header and footer above and
- * below it were not there and were added since, on request.
+ * <p>All of it is what the old server did. The entry is the rank's prefix followed by the
+ * player's name, so the list says who is here and what they are; the header and footer are the
+ * two lines it sent on login, about where you are playing and where to buy things. It sent them
+ * as a raw packet with the fields set by reflection, because the Bukkit of the day had no API
+ * for it - there is one now, so this uses it.
  *
  * <p>The list this fills is the one sent by the server the player is standing on, so it holds
  * the people on that server rather than the whole network. That was true of the original too.
