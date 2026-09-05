@@ -27,6 +27,9 @@ public class LobbyConfig extends OkaeriConfig {
     public ScoreboardSection scoreboard = new ScoreboardSection();
 
     @Comment("")
+    public UiSection ui = new UiSection();
+
+    @Comment("")
     public FlySection fly = new FlySection();
 
     @Comment("")
@@ -89,6 +92,37 @@ public class LobbyConfig extends OkaeriConfig {
      *     generator: landmc-lobby
      * </pre>
      */
+    /**
+     * The drawn interface: which characters the resource pack turns into panels.
+     *
+     * <p>Only the names live here. Where a panel goes and what sits on it is written in the
+     * scoreboard's own lines, because that is the layout and it belongs next to the text it
+     * arranges.
+     */
+    public static class UiSection extends OkaeriConfig {
+
+        @Comment("Czy scoreboard rysuje panele z resourcepacka.")
+        @Comment("Wylaczone = tokeny {PANEL:...} i {SPACE:...} sa po prostu usuwane,")
+        @Comment("wiec plansza bez paczki wyglada zwyczajnie zamiast pokazywac puste kwadraty.")
+        public boolean enabled = true;
+
+        @Comment("")
+        @Comment("Fonty z paczki. Pierwszy rysuje panele, drugi tylko przesuwa kursor.")
+        public String font = "landmc:ui";
+
+        @CustomKey("space-font")
+        public String spaceFont = "landmc:space";
+
+        @Comment("")
+        @Comment("Panele i ich znaki. Te same, ktore wypisuje scripts/build-ui-font.py")
+        @Comment("w landmc-deploy - przy dodaniu nowego panelu przepisz stamtad kolejny.")
+        public Map<String, String> panels = new LinkedHashMap<>(new LinkedHashMap<>(Map.of(
+                "sidebar_head", "U+E000",
+                "sidebar_body", "U+E001",
+                "sidebar_foot", "U+E002",
+                "bar", "U+E003")));
+    }
+
     public static class FlySection extends OkaeriConfig {
 
         @Comment("Komenda /fly i latanie z rangi. Wylaczone = komendy w ogole nie ma.")
@@ -271,24 +305,32 @@ public class LobbyConfig extends OkaeriConfig {
         public int refreshTicks = 20;
 
         @Comment("")
-        public String title = "<white>   <yellow><bold>LandMC.PL</bold><white>   ";
+        @Comment("Tytul planszy. Rysowany nad pierwsza linia, wiec panel naglowka jest tutaj.")
+        public String title =
+                "{PANEL:sidebar_head}{SPACE:-114}<yellow><bold>LandMC.PL";
+
+        @Comment("")
+        @Comment("Czy chowac liczby po prawej stronie linii.")
+        @Comment("Przy rysowanym interfejsie musza zniknac - to jedyna czesc planszy,")
+        @Comment("ktorej pakiet nie przykryje, bo klient rysuje ja po tekscie.")
+        @CustomKey("hide-numbers")
+        public boolean hideNumbers = true;
 
         @Comment("")
         @Comment("Linie od gory. Maksymalnie 16.")
+        @Comment("{PANEL:nazwa} rysuje panel z paczki, {SPACE:n} przesuwa o n pikseli.")
+        @Comment("Panel nie zajmuje miejsca: rysuje sie, a nastepny {SPACE:-...} cofa kursor")
+        @Comment("na jego poczatek, wiec tekst laduje na nim, a nie za nim.")
         @Comment("Placeholdery: {PLAYER}, {SERVER}, {ONLINE}, {DIAMONDS}, {COINS}, {LEVEL}")
         @Comment("{COINS} i {LEVEL} pokazuja na razie zero - sieć nie ma jeszcze drugiej")
         @Comment("waluty ani poziomow. Zapala sie same, kiedy te systemy powstana.")
         public List<String> lines = new ArrayList<>(List.of(
-                " ",
-                "<green><bold>Podserwer",
-                "<white>{SERVER}",
-                "  ",
-                "<light_purple><bold>Statystyki <white>gracza",
-                "<light_purple>• <white>Monety: <gold>{COINS}",
-                "<light_purple>• <white>Diamenty: <aqua>{DIAMONDS}❖",
-                "<light_purple>• <white>Poziom: <gold>{LEVEL}✰",
-                "   ",
-                "<yellow><bold>Strona <white>serwera",
-                "<white>landmc.pl"));
+                "{PANEL:sidebar_body}{SPACE:-170}<green><bold>Podserwer",
+                "{SPACE:6}<white>{SERVER}",
+                "{SPACE:6}<light_purple><bold>Statystyki <white>gracza",
+                "{SPACE:6}<light_purple>• <white>Monety: <gold>{COINS}",
+                "{SPACE:6}<light_purple>• <white>Diamenty: <aqua>{DIAMONDS}❖",
+                "{SPACE:6}<light_purple>• <white>Poziom: <gold>{LEVEL}✰",
+                "{PANEL:sidebar_foot}{SPACE:-118}<yellow>landmc.pl"));
     }
 }

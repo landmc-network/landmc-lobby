@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import io.papermc.paper.scoreboard.numbers.NumberFormat;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -45,6 +46,7 @@ public final class ScoreboardService {
     private final LobbyConfig config;
     private final BalanceTracker balances;
     private final ComponentFormatter formatter;
+    private final UiText ui;
 
     /** Which configured lines can change, so a refresh rewrites only those. */
     private final List<Integer> dynamic;
@@ -61,6 +63,7 @@ public final class ScoreboardService {
         this.config = Objects.requireNonNull(config, "config");
         this.balances = Objects.requireNonNull(balances, "balances");
         this.formatter = Objects.requireNonNull(formatter, "formatter");
+        this.ui = new UiText(config.ui);
         this.dynamic = dynamicLines(config.scoreboard.lines);
     }
 
@@ -74,8 +77,16 @@ public final class ScoreboardService {
         Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
 
         Objective objective = board.registerNewObjective(
-                "landmc", Criteria.DUMMY, this.formatter.format(this.config.scoreboard.title));
+                "landmc",
+                Criteria.DUMMY,
+                this.formatter.format(this.ui.expand(this.config.scoreboard.title)));
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+
+        if (this.config.scoreboard.hideNumbers) {
+            // The score is drawn after the line and hard against the right edge, so it is the
+            // one thing a panel cannot cover. Blanking it is the only way it goes away.
+            objective.numberFormat(NumberFormat.blank());
+        }
 
         for (int index = 0; index < lines.size() && index < ENTRIES.length; index++) {
             Team team = board.registerNewTeam("line" + index);
@@ -133,7 +144,7 @@ public final class ScoreboardService {
                 .replace("{COINS}", "0")
                 .replace("{LEVEL}", "0");
 
-        return this.formatter.format(text);
+        return this.formatter.format(this.ui.expand(text));
     }
 
     private List<String> lines() {
