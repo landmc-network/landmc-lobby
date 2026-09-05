@@ -133,8 +133,7 @@ public class LobbyConfig extends OkaeriConfig {
 
         @Comment("")
         @Comment("Przedmioty. Sloty 0-8 to hotbar, tak jak w oryginale: kompas na 0,")
-        @Comment("sklep na 2, glowa gracza na 4. Slot 8 mial /podserwery, ktorych ta siec")
-        @Comment("jeszcze nie ma - dopisz go tutaj, kiedy beda.")
+        @Comment("sklep na 2, glowa gracza na 4, podserwery na 8.")
         public List<HotbarItem> items = defaultItems();
 
         private static List<HotbarItem> defaultItems() {
@@ -155,6 +154,11 @@ public class LobbyConfig extends OkaeriConfig {
                     "<green>Twój profil <dark_gray>(PPM/LPM)",
                     List.of("<gray>Sprawdź swój profil klikając."),
                     "PROFILE"));
+            items.add(new HotbarItem(
+                    8, "PAPER", false,
+                    "<green>Wybierz podserwer <dark_gray>(PPM/LPM)",
+                    List.of("<gray>Wybierz odpowiedni dla siebie podserwer."),
+                    "LOBBIES"));
             return items;
         }
     }
