@@ -214,6 +214,11 @@ public final class NpcService {
         this.changed(entry);
     }
 
+    public void setHead(LobbyConfig.NpcEntry entry, String head) {
+        entry.head = head;
+        this.changed(entry);
+    }
+
     public void setItem(LobbyConfig.NpcEntry entry, String item) {
         entry.item = item;
         this.changed(entry);
@@ -233,12 +238,25 @@ public final class NpcService {
     public void sendTo(LobbyConfig.NpcEntry entry, String server) {
         entry.action = "SERWER";
         entry.server = server;
+
+        if (entry.addon.equals(this.config.npcs.defaultAddonMenu)) {
+            entry.addon = this.config.npcs.defaultAddon;
+        }
+
         this.changed(entry);
     }
 
     public void opens(LobbyConfig.NpcEntry entry, String menu) {
         entry.action = "MENU";
         entry.menu = menu;
+
+        // A figure that was pointed at a menu keeps whatever wording somebody wrote for it,
+        // but one still carrying the default invites people to join a server it no longer
+        // sends them to.
+        if (entry.addon.equals(this.config.npcs.defaultAddon)) {
+            entry.addon = this.config.npcs.defaultAddonMenu;
+        }
+
         this.changed(entry);
     }
 
@@ -267,6 +285,7 @@ public final class NpcService {
         }
 
         entry.skin = preset.skin;
+        entry.head = preset.head;
         entry.armourColour = preset.armourColour;
         entry.item = preset.item;
         entry.leftArm = new ArrayList<>(preset.leftArm);
@@ -461,10 +480,22 @@ public final class NpcService {
                 blockKey(at.getBlockX(), at.getBlockY(), at.getBlockZ()), entry.id);
     }
 
-    /** Head, body and hand. Everything optional: an undressed figure is still a figure. */
+    /**
+     * Head, body and hand.
+     *
+     * <p>The head first and always, because an armour stand has none of its own: what looks
+     * like a head is whatever is in the helmet slot, and a figure with that slot empty is a
+     * stick with a name over it. A texture when there is one, and a block when there is not.
+     */
     private void dress(ArmorStand stand, LobbyConfig.NpcEntry entry) {
         if (!entry.skin.isBlank()) {
             stand.getEquipment().setHelmet(Items.head(entry.skin).build());
+        }
+        else {
+            Material head = Material.matchMaterial(entry.head.toUpperCase(Locale.ROOT));
+            if (head != null && !head.isAir()) {
+                stand.getEquipment().setHelmet(new ItemStack(head));
+            }
         }
 
         Color colour = colour(entry.armourColour);

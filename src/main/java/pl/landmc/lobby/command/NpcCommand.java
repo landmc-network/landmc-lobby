@@ -136,6 +136,21 @@ public class NpcCommand {
         this.notices.viewer(player, messages -> messages.npcUpdated, named(entry.id));
     }
 
+    @Execute(name = "glowa")
+    void head(
+            @Context Player player,
+            @Arg(NAME_ARGUMENT) String id,
+            @Arg("material") String material) {
+
+        LobbyConfig.NpcEntry entry = this.entry(player, id);
+        if (entry == null) {
+            return;
+        }
+
+        this.npcs.setHead(entry, material);
+        this.notices.viewer(player, messages -> messages.npcUpdated, named(entry.id));
+    }
+
     @Execute(name = "przedmiot")
     void item(
             @Context Player player,

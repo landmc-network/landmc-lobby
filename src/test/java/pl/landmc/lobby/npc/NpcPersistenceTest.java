@@ -1,11 +1,13 @@
 package pl.landmc.lobby.npc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import pl.landmc.lobby.config.LobbyConfig;
@@ -60,9 +62,19 @@ class NpcPersistenceTest {
     void shipsTheOutfitsTheOldServerHadInItsSource(@TempDir Path directory) {
         LobbyConfig config = configs(directory).load(directory, "config.yml", LobbyConfig.class);
 
-        assertEquals(3, config.npcs.presets.size());
-        assertEquals("skyblock", config.npcs.presets.get(0).id);
+        // The three the old server had in its source, and the two for the screens it never
+        // gave a figure to at all.
+        assertEquals(
+                List.of("skyblock", "budowlany", "sklep", "nagrody", "partygames"),
+                config.npcs.presets.stream().map(preset -> preset.id).toList());
+
         assertEquals("GRASS_BLOCK", config.npcs.presets.get(0).item);
+
+        // A figure with nothing in the helmet slot is a stick with a name over it, so every
+        // outfit puts something there.
+        for (LobbyConfig.NpcPreset preset : config.npcs.presets) {
+            assertFalse(preset.head.isBlank(), preset.id + " would stand without a head");
+        }
     }
 
     /**

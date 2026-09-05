@@ -115,8 +115,13 @@ public class LobbyConfig extends OkaeriConfig {
 
         @Comment("")
         @Comment("Tekst zachety dla nowo postawionej figurki.")
+        @Comment("Osobno dla figurki przenoszacej i otwierajacej menu: zaproszenie do")
+        @Comment("dolaczenia nad sklepem jest zaproszeniem donikad.")
         @CustomKey("default-addon")
         public String defaultAddon = "Kliknij, aby dołączyć";
+
+        @CustomKey("default-addon-menu")
+        public String defaultAddonMenu = "Kliknij, aby otworzyć";
 
         @Comment("")
         @Comment("Czy wejscie na blok figurki tez przenosi na serwer, tak jak na starym LandMC.")
@@ -169,6 +174,26 @@ public class LobbyConfig extends OkaeriConfig {
                         List.of(9.0D, 17.0D, 12.0D),
                         List.of(0.0D, 29.0D, 72.0D)),
                 preset(
+                        "sklep",
+                        "",
+                        "#FFAA00",
+                        "EMERALD",
+                        List.of(),
+                        List.of(340.0D, 0.0D, 15.0D),
+                        List.of(),
+                        List.of(),
+                        "EMERALD_BLOCK"),
+                preset(
+                        "nagrody",
+                        "",
+                        "#55FF55",
+                        "GOLD_INGOT",
+                        List.of(),
+                        List.of(340.0D, 0.0D, 15.0D),
+                        List.of(),
+                        List.of(),
+                        "CHEST"),
+                preset(
                         "partygames",
                         "https://textures.minecraft.net/texture/"
                                 + "fa4c0a8c200c4f1fedf8bbbe31daa81504dcb2f920b00e71f85e0eb1904a1929",
@@ -193,7 +218,23 @@ public class LobbyConfig extends OkaeriConfig {
                 List<Double> leftLeg,
                 List<Double> rightLeg) {
 
+            return preset(id, skin, armourColour, item, leftArm, rightArm, leftLeg, rightLeg,
+                    "PLAYER_HEAD");
+        }
+
+        private static NpcPreset preset(
+                String id,
+                String skin,
+                String armourColour,
+                String item,
+                List<Double> leftArm,
+                List<Double> rightArm,
+                List<Double> leftLeg,
+                List<Double> rightLeg,
+                String head) {
+
             NpcPreset preset = new NpcPreset();
+            preset.head = head;
             preset.id = id;
             preset.skin = skin;
             preset.armourColour = armourColour;
@@ -218,8 +259,11 @@ public class LobbyConfig extends OkaeriConfig {
         @Comment("Nazwa szablonu. Zgodna z nazwa serwera = zakladany automatycznie.")
         public String id = "";
 
-        @Comment("Adres tekstury glowy.")
+        @Comment("Adres tekstury glowy. Puste = uzyty zostanie material ponizej.")
         public String skin = "";
+
+        @Comment("Co na glowie, kiedy nie ma tekstury.")
+        public String head = "PLAYER_HEAD";
 
         @Comment("Kolor skorzanej zbroi, szesnastkowo.")
         @CustomKey("armour-colour")
@@ -278,8 +322,12 @@ public class LobbyConfig extends OkaeriConfig {
         public float yaw = 0.0F;
 
         @Comment("")
-        @Comment("Adres tekstury glowy. Puste = zwykla glowa gracza.")
+        @Comment("Adres tekstury glowy. Puste = uzyty zostanie material ponizej.")
         public String skin = "";
+
+        @Comment("Co figurka ma na glowie, kiedy nie ma tekstury. Armor stand nie ma wlasnej")
+        @Comment("glowy - glowa to zawartosc slotu na helm, wiec bez tego stoi bez niej.")
+        public String head = "PLAYER_HEAD";
 
         @Comment("Kolor skorzanej zbroi: nazwa (green, gold, brown...) albo #rrggbb.")
         @Comment("Puste = zbroja bez barwienia.")
