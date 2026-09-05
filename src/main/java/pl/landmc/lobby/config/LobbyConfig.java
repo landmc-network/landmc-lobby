@@ -289,7 +289,8 @@ public class LobbyConfig extends OkaeriConfig {
 
         @Comment("")
         @Comment("Przedmioty. Sloty 0-8 to hotbar, tak jak w oryginale: kompas na 0,")
-        @Comment("sklep na 2, glowa gracza na 4, podserwery na 8.")
+        @Comment("sklep na 2, glowa gracza na 4, podserwery na 8. Slot 6 stal pusty i")
+        @Comment("w oryginale, i jest teraz nasz - dodatki nie istnialy na starym LandMC.")
         public List<HotbarItem> items = defaultItems();
 
         private static List<HotbarItem> defaultItems() {
@@ -310,6 +311,11 @@ public class LobbyConfig extends OkaeriConfig {
                     "<green>Twój profil <dark_gray>(PPM/LPM)",
                     List.of("<gray>Sprawdź swoje statystyki klikając."),
                     "PROFILE"));
+            items.add(new HotbarItem(
+                    6, "FIREWORK_ROCKET", false,
+                    "<green>Dodatki <dark_gray>(PPM/LPM)",
+                    List.of("<gray>Cząsteczki i poświata za diamenty."),
+                    "COSMETICS"));
             items.add(new HotbarItem(
                     8, "PAPER", false,
                     "<green>Wybierz podserwer <dark_gray>(PPM/LPM)",
