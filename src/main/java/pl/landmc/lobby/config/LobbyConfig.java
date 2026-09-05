@@ -124,15 +124,19 @@ public class LobbyConfig extends OkaeriConfig {
         @Comment("Panele i ich znaki. Te same, ktore wypisuje scripts/build-ui-font.py")
         @Comment("w landmc-deploy - przy dodaniu nowego panelu przepisz stamtad kolejny.")
         public Map<String, String> panels = new LinkedHashMap<>(new LinkedHashMap<>(Map.of(
-                "sidebar", "U+E000",
-                "bar", "U+E001")));
+                "sidebar_head", "U+E000",
+                "sidebar_body", "U+E001",
+                "sidebar_foot", "U+E002",
+                "bar", "U+E003")));
 
         @Comment("")
         @Comment("Szerokosci tych paneli. Panel przesuwa kursor o swoja szerokosc, wiec")
         @Comment("bez tego linia z panelem liczylaby sie o te piksele za krotko.")
         @CustomKey("panel-widths")
         public Map<String, Integer> panelWidths = new LinkedHashMap<>(new LinkedHashMap<>(Map.of(
-                "sidebar", 132,
+                "sidebar_head", 132,
+                "sidebar_body", 132,
+                "sidebar_foot", 132,
                 "bar", 220)));
     }
 
@@ -321,10 +325,10 @@ public class LobbyConfig extends OkaeriConfig {
 
         @Comment("")
         @Comment("Tytul planszy. Rysowany nad pierwsza linia, wiec panel naglowka jest tutaj.")
-        @Comment("Panel calej planszy jest rysowany tutaj i siega w dol pod ostatnia linie,")
-        @Comment("wiec jest jeden zamiast kawalka na kazdy wiersz - i nie ma jak sie rozjechac.")
+        @Comment("Pasek z nazwa serwera. Tekst wysrodkowany na panelu: -90 to jego szerokosc")
+        @Comment("minus polowa tego, co zostaje po odjeciu napisu.")
         public String title =
-                "{SPACE:-6}{PANEL:sidebar}{SPACE:-118}<yellow><bold>LandMC.PL";
+                "{SPACE:-6}{PANEL:sidebar_head}{SPACE:-90}<yellow><bold>LandMC.PL";
 
         @Comment("")
         @Comment("Czy chowac liczby po prawej stronie linii.")
@@ -342,14 +346,17 @@ public class LobbyConfig extends OkaeriConfig {
         @Comment("{COINS} i {LEVEL} pokazuja na razie zero - sieć nie ma jeszcze drugiej")
         @Comment("waluty ani poziomow. Zapala sie same, kiedy te systemy powstana.")
         public List<String> lines = new ArrayList<>(List.of(
-                "{SPACE:8}<green><bold>Podserwer",
+                // Empty, and that is the gap between the name bar and the body.
+                " ",
+                "{SPACE:-6}{PANEL:sidebar_body}{SPACE:-118}<green><bold>Podserwer",
                 "{SPACE:8}<white>{SERVER}",
                 "{SPACE:8} ",
                 "{SPACE:8}<light_purple><bold>Statystyki <white>gracza",
                 "{SPACE:8}<light_purple>• <white>Monety: <gold>{COINS}",
                 "{SPACE:8}<light_purple>• <white>Diamenty: <aqua>{DIAMONDS}❖",
                 "{SPACE:8}<light_purple>• <white>Poziom: <gold>{LEVEL}✰",
-                "{SPACE:8} ",
-                "{SPACE:8}<yellow>landmc.pl"));
+                // And this one is the gap between the body and the address.
+                " ",
+                "{SPACE:-6}{PANEL:sidebar_foot}{SPACE:-82}<yellow>landmc.pl"));
     }
 }
