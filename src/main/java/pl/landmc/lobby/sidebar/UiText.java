@@ -90,12 +90,23 @@ public final class UiText {
      * without the pack gets a plain sidebar rather than a column of missing-glyph boxes.
      */
     public String render(String line) {
+        return this.render(line, this.config.lineWidth);
+    }
+
+    /**
+     * The same, padded to a width the caller chooses.
+     *
+     * <p>Each surface has its own: the sidebar is as wide as the board, the bar across the top
+     * is as wide as its panel. What matters is only that every line on one surface agrees, since
+     * that is what stops the client aligning them against each other.
+     */
+    public String render(String line, int width) {
         String expanded = this.expand(line);
-        if (!this.config.enabled || this.config.lineWidth <= 0) {
+        if (!this.config.enabled || width <= 0) {
             return expanded;
         }
 
-        int missing = this.config.lineWidth - this.width(expanded);
+        int missing = width - this.width(expanded);
         return missing == 0 ? expanded : expanded + this.space(missing);
     }
 

@@ -44,6 +44,7 @@ import pl.landmc.lobby.messaging.PingMessage;
 import pl.landmc.lobby.messaging.PongMessage;
 import pl.landmc.lobby.profile.ProfileRepository;
 import pl.landmc.lobby.profile.ProfileService;
+import pl.landmc.lobby.sidebar.UiText;
 import pl.landmc.lobby.spawn.SpawnService;
 import pl.landmc.lobby.world.WorldSetup;
 import pl.landmc.lobby.world.WorldSetupListener;
@@ -143,7 +144,10 @@ public final class LobbyBootstrap {
                 .build();
         this.logger.info("Registered {} commands.", commands.size());
 
-        this.bossBar = new BossBarService(this.config, formatter);
+        // The bar shares the sidebar's layout engine: the same panels, the same offsets, the
+        // same measuring - only the surface differs.
+        this.bossBar = new BossBarService(
+                this.config, formatter, new UiText(this.config.ui, formatter));
 
         this.plugin.getServer().getPluginManager()
                 .registerEvents(new ProfileListener(this.profiles), this.plugin);
@@ -266,8 +270,15 @@ public final class LobbyBootstrap {
                 .registerEvents(new ScoreboardListener(scoreboards), this.plugin);
 
         long ticks = Math.max(1L, this.config.scoreboard.refreshTicks);
-        this.plugin.getServer().getScheduler()
-                .runTaskTimer(this.plugin, scoreboards::refreshAll, ticks, ticks);
+        this.plugin.getServer().getScheduler().runTaskTimer(this.plugin, () -> {
+            scoreboards.refreshAll();
+            // On the same timer, because the bar shows the same kind of thing and there is no
+            // reason for a second one. It is a single update for the whole server, not one per
+            // player, so it costs a fraction of what the boards do.
+            if (this.bossBar != null) {
+                this.bossBar.refresh();
+            }
+        }, ticks, ticks);
     }
 
     private void startAutosave() {

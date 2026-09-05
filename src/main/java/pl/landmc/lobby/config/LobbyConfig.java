@@ -167,18 +167,31 @@ public class LobbyConfig extends OkaeriConfig {
         public boolean enabled = true;
 
         @Comment("")
-        @Comment("Tresc paska. Kolory rang sa te, ktore maja grupy w LuckPermsie.")
-        public String text =
-                "<red>Rangi <dark_gray>(<yellow><bold>VIP</bold><gray>,"
-                        + " <light_purple><bold>SVIP</bold><gray>,"
+        @Comment("Wiersze paska, od gory. Kazdy to osobny bossbar - tytul bossbara to jedna")
+        @Comment("linia, wiec panel na kilka wierszy to kilka paskow, a klient sam ustawia je")
+        @Comment("jeden pod drugim. Panel rysowany jest na pierwszym i siega w dol po resztę.")
+        @Comment("Placeholdery: {SERVER}, {ONLINE} - tylko takie, ktore sa wspolne dla")
+        @Comment("wszystkich, bo paski sa jedne dla calego serwera.")
+        public List<String> lines = new ArrayList<>(List.of(
+                "{PANEL:bar}{SPACE:-208}<red>Rangi <dark_gray>("
+                        + "<yellow><bold>VIP</bold><gray>, <light_purple><bold>SVIP</bold><gray>,"
                         + " <b><#FF5555>S<#FFAA00>Z<#FFFF55>E<#55FF55>F<#55FFFF>U<#00AAAA>N"
                         + "<#FF55FF>C<#FF5555>I<#FFAA00>O</b><dark_gray>)"
-                        + " <red>➤ <white><underlined>/rangi";
+                        + " <red>➤ <white><underlined>/rangi",
+                "{SPACE:12}<gray>Online: <white>{ONLINE}"
+                        + " <dark_gray>| <gray>Podserwer: <white>{SERVER}"));
+
+        @Comment("")
+        @Comment("Szerokosc, do ktorej dopychany jest kazdy wiersz paska.")
+        @Comment("Tytul bossbara jest wysrodkowany, wiec rowna szerokosc to jedyne, co ustawia")
+        @Comment("wiersze w pionie wzgledem siebie - inaczej kazdy centruje sie osobno.")
+        @CustomKey("line-width")
+        public int lineWidth = 220;
 
         @Comment("")
         @Comment("Kolor paska: PINK, BLUE, RED, GREEN, YELLOW, PURPLE lub WHITE.")
-        @Comment("Musi byc ten, ktorego tekstury zeruje paczka - inaczej pod napisem zostanie")
-        @Comment("widoczny pasek. Zerowany jest jeden kolor, zeby zwykly boss dalej mial swoj.")
+        @Comment("Musi byc ten, ktorego tekstury zeruje paczka - inaczej pod napisami zostana")
+        @Comment("widoczne paski. Zerowany jest jeden kolor, zeby zwykly boss dalej mial swoj.")
         public String colour = "BLUE";
 
         @Comment("Styl: PROGRESS (jednolity, jak w oryginale) albo NOTCHED_6/10/12/20.")
