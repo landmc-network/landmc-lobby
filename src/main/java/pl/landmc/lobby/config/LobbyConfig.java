@@ -118,7 +118,7 @@ public class LobbyConfig extends OkaeriConfig {
         @Comment("Bez tego kazda linia jest wyrownywana do prawej osobno i plansza rozjezdza")
         @Comment("sie przy kazdej zmianie liczby. 0 wylacza dopychanie.")
         @CustomKey("line-width")
-        public int lineWidth = 176;
+        public int lineWidth = 124;
 
         @Comment("")
         @Comment("Panele i ich znaki. Te same, ktore wypisuje scripts/build-ui-font.py")
@@ -132,7 +132,7 @@ public class LobbyConfig extends OkaeriConfig {
         @Comment("bez tego linia z panelem liczylaby sie o te piksele za krotko.")
         @CustomKey("panel-widths")
         public Map<String, Integer> panelWidths = new LinkedHashMap<>(new LinkedHashMap<>(Map.of(
-                "sidebar", 184,
+                "sidebar", 132,
                 "bar", 220)));
     }
 
@@ -322,7 +322,7 @@ public class LobbyConfig extends OkaeriConfig {
         @Comment("Panel calej planszy jest rysowany tutaj i siega w dol pod ostatnia linie,")
         @Comment("wiec jest jeden zamiast kawalka na kazdy wiersz - i nie ma jak sie rozjechac.")
         public String title =
-                "{SPACE:-6}{PANEL:sidebar}{SPACE:-170}<yellow><bold>LandMC.PL";
+                "{SPACE:-6}{PANEL:sidebar}{SPACE:-118}<yellow><bold>LandMC.PL";
 
         @Comment("")
         @Comment("Czy chowac liczby po prawej stronie linii.")
