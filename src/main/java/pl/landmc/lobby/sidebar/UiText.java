@@ -33,8 +33,8 @@ import pl.landmc.platform.component.ComponentFormatter;
  */
 public final class UiText {
 
-    /** {@code {SPACE:-170}} and {@code {PANEL:sidebar}}. */
-    private static final Pattern TOKEN = Pattern.compile("\\{(SPACE|PANEL):([^}]+)}");
+    /** {@code {SPACE:-170}}, {@code {PANEL:sidebar}} and {@code {AT:60}}. */
+    private static final Pattern TOKEN = Pattern.compile("\\{(SPACE|PANEL|AT):([^}]+)}");
 
     /** The steps the pack's space font defines, largest first so the split is shortest. */
     private static final int[] STEPS = {256, 128, 64, 32, 16, 8, 4, 2, 1};
@@ -110,19 +110,51 @@ public final class UiText {
         return missing == 0 ? expanded : expanded + this.space(missing);
     }
 
+    /**
+     * Replaces the layout tokens, left to right.
+     *
+     * <p>Left to right and not all at once, because {@code {AT:60}} means "put the cursor sixty
+     * pixels from the start of this line" and the only way to know how far along the cursor
+     * already is, is to have built everything before it. That token is what makes a row of
+     * tiles writable at all: without it every offset is the sum of the widths of everything to
+     * its left, recomputed by hand each time a word changes.
+     */
     private String expand(String line) {
         Matcher matcher = TOKEN.matcher(line);
         StringBuilder result = new StringBuilder(line.length());
 
+        int consumed = 0;
         while (matcher.find()) {
-            String replacement = this.config.enabled
-                    ? this.resolve(matcher.group(1), matcher.group(2))
-                    : "";
-            matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
+            result.append(line, consumed, matcher.start());
+            consumed = matcher.end();
+
+            if (!this.config.enabled) {
+                continue;
+            }
+
+            String kind = matcher.group(1);
+            String argument = matcher.group(2);
+
+            if ("AT".equals(kind)) {
+                result.append(this.moveTo(result.toString(), argument));
+            }
+            else {
+                result.append(this.resolve(kind, argument));
+            }
         }
-        matcher.appendTail(result);
+        result.append(line, consumed, line.length());
 
         return result.toString();
+    }
+
+    /** The characters that take the cursor from where it is now to where the token asks. */
+    private String moveTo(String drawnSoFar, String argument) {
+        try {
+            return this.space(Integer.parseInt(argument.trim()) - this.width(drawnSoFar));
+        }
+        catch (NumberFormatException notANumber) {
+            return "";
+        }
     }
 
     private String resolve(String kind, String argument) {

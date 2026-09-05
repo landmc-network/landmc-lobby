@@ -128,6 +128,12 @@ public final class LobbyBootstrap {
 
         FlyService fly = new FlyService(this.config);
 
+        // Built here rather than beside the board, because the listener below needs them and it
+        // is registered before the board is started. The board is handed the same tracker.
+        BalanceTracker balances = new BalanceTracker(this.plugin, this.logger);
+        this.bossBar = new BossBarService(
+                this.config, formatter, new UiText(this.config.ui, formatter), balances);
+
         // A lobby with flight switched off does not answer /fly at all, rather than answering
         // it with a refusal - the command simply is not part of that server.
         List<Object> commands = new ArrayList<>(List.of(
@@ -144,10 +150,7 @@ public final class LobbyBootstrap {
                 .build();
         this.logger.info("Registered {} commands.", commands.size());
 
-        // The bar shares the sidebar's layout engine: the same panels, the same offsets, the
-        // same measuring - only the surface differs.
-        this.bossBar = new BossBarService(
-                this.config, formatter, new UiText(this.config.ui, formatter));
+
 
         this.plugin.getServer().getPluginManager()
                 .registerEvents(new ProfileListener(this.profiles), this.plugin);
@@ -159,7 +162,7 @@ public final class LobbyBootstrap {
         this.plugin.getServer().getPluginManager()
                 .registerEvents(new UnknownCommandListener(platformNotices), this.plugin);
 
-        this.startScoreboards(formatter);
+        this.startScoreboards(formatter, balances);
 
         HotbarService hotbar = new HotbarService(this.config, formatter, this.logger);
         if (hotbar.isEnabled()) {
@@ -256,10 +259,13 @@ public final class LobbyBootstrap {
      * player straight away; the periodic pass is for the lines nothing announces, such as how
      * many people are online.
      */
-    private void startScoreboards(ComponentFormatter formatter) {
-        BalanceTracker balances = new BalanceTracker(this.plugin, this.logger);
+    private void startScoreboards(ComponentFormatter formatter, BalanceTracker balances) {
         ScoreboardService scoreboards = new ScoreboardService(this.config, balances, formatter);
-        balances.onChanged(scoreboards::refresh);
+
+        balances.onChanged(player -> {
+            scoreboards.refresh(player);
+            this.bossBar.refresh(player);
+        });
 
         if (!scoreboards.isEnabled()) {
             this.logger.info("Lobby scoreboard is off.");
@@ -275,9 +281,7 @@ public final class LobbyBootstrap {
             // On the same timer, because the bar shows the same kind of thing and there is no
             // reason for a second one. It is a single update for the whole server, not one per
             // player, so it costs a fraction of what the boards do.
-            if (this.bossBar != null) {
-                this.bossBar.refresh();
-            }
+            this.bossBar.refreshAll();
         }, ticks, ticks);
     }
 

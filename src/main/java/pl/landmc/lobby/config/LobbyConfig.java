@@ -123,21 +123,40 @@ public class LobbyConfig extends OkaeriConfig {
         @Comment("")
         @Comment("Panele i ich znaki. Te same, ktore wypisuje scripts/build-ui-font.py")
         @Comment("w landmc-deploy - przy dodaniu nowego panelu przepisz stamtad kolejny.")
-        public Map<String, String> panels = new LinkedHashMap<>(new LinkedHashMap<>(Map.of(
-                "sidebar_head", "U+E000",
-                "sidebar_body", "U+E001",
-                "sidebar_foot", "U+E002",
-                "bar", "U+E003")));
+        public Map<String, String> panels = new LinkedHashMap<>(new LinkedHashMap<>(Map.ofEntries(
+                Map.entry("sidebar_head", "U+E000"),
+                Map.entry("sidebar_body", "U+E001"),
+                Map.entry("sidebar_foot", "U+E002"),
+                Map.entry("chip", "U+E003"),
+                Map.entry("chip_wide", "U+E004"),
+                Map.entry("icon_time", "U+E100"),
+                Map.entry("icon_gems", "U+E101"),
+                Map.entry("icon_coins", "U+E102"),
+                Map.entry("icon_star", "U+E103"),
+                Map.entry("icon_generators", "U+E104"),
+                Map.entry("icon_boost", "U+E105"),
+                Map.entry("icon_plus", "U+E106"),
+                Map.entry("icon_minus", "U+E107"))));
 
         @Comment("")
         @Comment("Szerokosci tych paneli. Panel przesuwa kursor o swoja szerokosc, wiec")
         @Comment("bez tego linia z panelem liczylaby sie o te piksele za krotko.")
         @CustomKey("panel-widths")
-        public Map<String, Integer> panelWidths = new LinkedHashMap<>(new LinkedHashMap<>(Map.of(
-                "sidebar_head", 132,
-                "sidebar_body", 132,
-                "sidebar_foot", 132,
-                "bar", 220)));
+        @Comment("Ikony maja 12 pikseli obrazka plus piksel odstepu, tak jak litera.")
+        public Map<String, Integer> panelWidths = new LinkedHashMap<>(new LinkedHashMap<>(Map.ofEntries(
+                Map.entry("sidebar_head", 132),
+                Map.entry("sidebar_body", 132),
+                Map.entry("sidebar_foot", 132),
+                Map.entry("chip", 56),
+                Map.entry("chip_wide", 176),
+                Map.entry("icon_time", 13),
+                Map.entry("icon_gems", 13),
+                Map.entry("icon_coins", 13),
+                Map.entry("icon_star", 13),
+                Map.entry("icon_generators", 13),
+                Map.entry("icon_boost", 13),
+                Map.entry("icon_plus", 13),
+                Map.entry("icon_minus", 13))));
     }
 
     public static class FlySection extends OkaeriConfig {
@@ -173,13 +192,18 @@ public class LobbyConfig extends OkaeriConfig {
         @Comment("Placeholdery: {SERVER}, {ONLINE} - tylko takie, ktore sa wspolne dla")
         @Comment("wszystkich, bo paski sa jedne dla calego serwera.")
         public List<String> lines = new ArrayList<>(List.of(
-                "{PANEL:bar}{SPACE:-208}<red>Rangi <dark_gray>("
+                // A row of tiles. Each one is drawn, the cursor is put back inside it for its
+                // contents, then moved to where the next one starts - which is what {AT:...}
+                // is for. Three of 56 with four pixels between them comes to 176, the width of
+                // the row below.
+                "{PANEL:chip}{AT:7}{PANEL:icon_gems}{AT:23}<aqua>{DIAMONDS}"
+                        + "{AT:60}{PANEL:chip}{AT:67}{PANEL:icon_coins}{AT:83}<gold>{COINS}"
+                        + "{AT:120}{PANEL:chip}{AT:127}{PANEL:icon_star}{AT:143}<yellow>{LEVEL}",
+                "{PANEL:chip_wide}{AT:8}<red>Rangi <dark_gray>("
                         + "<yellow><bold>VIP</bold><gray>, <light_purple><bold>SVIP</bold><gray>,"
                         + " <b><#FF5555>S<#FFAA00>Z<#FFFF55>E<#55FF55>F<#55FFFF>U<#00AAAA>N"
                         + "<#FF55FF>C<#FF5555>I<#FFAA00>O</b><dark_gray>)"
-                        + " <red>➤ <white><underlined>/rangi",
-                "{SPACE:12}<gray>Online: <white>{ONLINE}"
-                        + " <dark_gray>| <gray>Podserwer: <white>{SERVER}"));
+                        + " <red>➤ <white><underlined>/rangi"));
 
         @Comment("")
         @Comment("Szerokosc, do ktorej dopychany jest kazdy wiersz paska.")
