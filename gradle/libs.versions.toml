@@ -13,7 +13,7 @@ landmc-menus = "1.12.0"
 # names, which is what it was before there were ranks.
 luckperms = "5.5"
 
-landmc-platform = "1.4.0"
+landmc-platform = "1.8.0"
 
 # Paper 26.2 publishes Java 25 bytecode, which is why this project compiles with --release 25.
 paper = "26.2.build.121-stable"

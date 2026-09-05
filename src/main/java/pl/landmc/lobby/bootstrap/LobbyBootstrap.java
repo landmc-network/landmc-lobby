@@ -32,6 +32,8 @@ import pl.landmc.lobby.command.SetSpawnCommand;
 import pl.landmc.lobby.command.SpawnCommand;
 import pl.landmc.lobby.config.LobbyConfig;
 import pl.landmc.lobby.listener.NpcListener;
+import pl.landmc.lobby.listener.PortalListener;
+import pl.landmc.lobby.listener.ProtectionListener;
 import pl.landmc.lobby.menu.MenuChannel;
 import pl.landmc.lobby.messaging.ServerCountsMessage;
 import pl.landmc.lobby.npc.NpcService;
@@ -197,6 +199,13 @@ public final class LobbyBootstrap {
                         new ArrivalListener(this.bossBar, fly, this.plugin), this.plugin);
         this.plugin.getServer().getPluginManager()
                 .registerEvents(new UnknownCommandListener(platformNotices), this.plugin);
+        this.plugin.getServer().getPluginManager()
+                .registerEvents(new ProtectionListener(this.config), this.plugin);
+
+        if (this.config.portal.enabled) {
+            this.plugin.getServer().getPluginManager().registerEvents(
+                    new PortalListener(this.plugin, menuChannel, this.config), this.plugin);
+        }
 
         this.startScoreboards(formatter, balances);
 

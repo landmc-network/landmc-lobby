@@ -40,6 +40,12 @@ public class LobbyConfig extends OkaeriConfig {
     public NpcSection npcs = new NpcSection();
 
     @Comment("")
+    public ProtectionSection protection = new ProtectionSection();
+
+    @Comment("")
+    public PortalSection portal = new PortalSection();
+
+    @Comment("")
     public WorldSection world = new WorldSection();
 
     @Comment("Baza danych profili lobby. H2 dziala bez zadnej konfiguracji.")
@@ -291,6 +297,49 @@ public class LobbyConfig extends OkaeriConfig {
 
         @CustomKey("right-leg")
         public List<Double> rightLeg = new ArrayList<>();
+    }
+
+    /** Keeping people alive in a place where nothing is meant to hurt them. */
+    public static class ProtectionSection extends OkaeriConfig {
+
+        @Comment("Czy gracz na lobby moze dostac obrazenia. Tryb adventure i peaceful zdejmuja")
+        @Comment("moby i glod, ale nie upadek - a lobby to mapa z krawedziami.")
+        @CustomKey("block-damage")
+        public boolean blockDamage = true;
+
+        @Comment("")
+        @Comment("Czy blokowac glod. Peaceful i tak go zdejmuje; to jest po to, zeby podniesienie")
+        @Comment("poziomu trudnosci nie zaczelo po cichu glodzic lobby.")
+        @CustomKey("keep-fed")
+        public boolean keepFed = true;
+    }
+
+    /**
+     * Portal na spawnie: wbiegniecie odrzuca i otwiera wybor trybu.
+     *
+     * <p>Prosto ze starej wersji sieci. Portal czyta sie jako przejscie dalej bez pisania nad
+     * nim "kliknij tutaj", a nic w nim nie teleportuje.
+     */
+    public static class PortalSection extends OkaeriConfig {
+
+        @Comment("Czy portale na lobby odrzucaja i otwieraja menu.")
+        public boolean enabled = true;
+
+        @Comment("")
+        @Comment("Sila odrzutu do tylu i podbicia w gore.")
+        public double bounce = 0.8D;
+
+        public double lift = 0.45D;
+
+        @Comment("")
+        @Comment("Po ilu tickach otwiera sie menu. Okno, ktore pojawia sie w pol kroku,")
+        @Comment("lapie klawisz przeznaczony na chodzenie.")
+        @CustomKey("delay-ticks")
+        public long delayTicks = 7L;
+
+        @Comment("")
+        @Comment("Ktore menu. SERVERS to wybor trybu, tak jak /serwery.")
+        public String menu = "SERVERS";
     }
 
     public static class LobbySection extends OkaeriConfig {
