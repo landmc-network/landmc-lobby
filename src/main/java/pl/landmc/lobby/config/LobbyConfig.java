@@ -114,13 +114,26 @@ public class LobbyConfig extends OkaeriConfig {
         public String spaceFont = "landmc:space";
 
         @Comment("")
+        @Comment("Szerokosc, do ktorej dopychana jest kazda linia planszy, w pikselach.")
+        @Comment("Bez tego kazda linia jest wyrownywana do prawej osobno i plansza rozjezdza")
+        @Comment("sie przy kazdej zmianie liczby. 0 wylacza dopychanie.")
+        @CustomKey("line-width")
+        public int lineWidth = 176;
+
+        @Comment("")
         @Comment("Panele i ich znaki. Te same, ktore wypisuje scripts/build-ui-font.py")
         @Comment("w landmc-deploy - przy dodaniu nowego panelu przepisz stamtad kolejny.")
         public Map<String, String> panels = new LinkedHashMap<>(new LinkedHashMap<>(Map.of(
-                "sidebar_head", "U+E000",
-                "sidebar_body", "U+E001",
-                "sidebar_foot", "U+E002",
-                "bar", "U+E003")));
+                "sidebar", "U+E000",
+                "bar", "U+E001")));
+
+        @Comment("")
+        @Comment("Szerokosci tych paneli. Panel przesuwa kursor o swoja szerokosc, wiec")
+        @Comment("bez tego linia z panelem liczylaby sie o te piksele za krotko.")
+        @CustomKey("panel-widths")
+        public Map<String, Integer> panelWidths = new LinkedHashMap<>(new LinkedHashMap<>(Map.of(
+                "sidebar", 176,
+                "bar", 220)));
     }
 
     public static class FlySection extends OkaeriConfig {
@@ -306,8 +319,10 @@ public class LobbyConfig extends OkaeriConfig {
 
         @Comment("")
         @Comment("Tytul planszy. Rysowany nad pierwsza linia, wiec panel naglowka jest tutaj.")
+        @Comment("Panel calej planszy jest rysowany tutaj i siega w dol pod ostatnia linie,")
+        @Comment("wiec jest jeden zamiast kawalka na kazdy wiersz - i nie ma jak sie rozjechac.")
         public String title =
-                "{PANEL:sidebar_head}{SPACE:-114}<yellow><bold>LandMC.PL";
+                "{PANEL:sidebar}{SPACE:-118}<yellow><bold>LandMC.PL";
 
         @Comment("")
         @Comment("Czy chowac liczby po prawej stronie linii.")
@@ -325,12 +340,14 @@ public class LobbyConfig extends OkaeriConfig {
         @Comment("{COINS} i {LEVEL} pokazuja na razie zero - sieć nie ma jeszcze drugiej")
         @Comment("waluty ani poziomow. Zapala sie same, kiedy te systemy powstana.")
         public List<String> lines = new ArrayList<>(List.of(
-                "{PANEL:sidebar_body}{SPACE:-170}<green><bold>Podserwer",
-                "{SPACE:6}<white>{SERVER}",
-                "{SPACE:6}<light_purple><bold>Statystyki <white>gracza",
-                "{SPACE:6}<light_purple>• <white>Monety: <gold>{COINS}",
-                "{SPACE:6}<light_purple>• <white>Diamenty: <aqua>{DIAMONDS}❖",
-                "{SPACE:6}<light_purple>• <white>Poziom: <gold>{LEVEL}✰",
-                "{PANEL:sidebar_foot}{SPACE:-118}<yellow>landmc.pl"));
+                "{SPACE:-168}<green><bold>Podserwer",
+                "{SPACE:-168}<white>{SERVER}",
+                "{SPACE:-168} ",
+                "{SPACE:-168}<light_purple><bold>Statystyki <white>gracza",
+                "{SPACE:-168}<light_purple>• <white>Monety: <gold>{COINS}",
+                "{SPACE:-168}<light_purple>• <white>Diamenty: <aqua>{DIAMONDS}❖",
+                "{SPACE:-168}<light_purple>• <white>Poziom: <gold>{LEVEL}✰",
+                "{SPACE:-168} ",
+                "{SPACE:-168}<yellow>landmc.pl"));
     }
 }

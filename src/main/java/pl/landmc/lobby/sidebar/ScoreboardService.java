@@ -63,7 +63,7 @@ public final class ScoreboardService {
         this.config = Objects.requireNonNull(config, "config");
         this.balances = Objects.requireNonNull(balances, "balances");
         this.formatter = Objects.requireNonNull(formatter, "formatter");
-        this.ui = new UiText(config.ui);
+        this.ui = new UiText(config.ui, formatter);
         this.dynamic = dynamicLines(config.scoreboard.lines);
     }
 
@@ -79,7 +79,7 @@ public final class ScoreboardService {
         Objective objective = board.registerNewObjective(
                 "landmc",
                 Criteria.DUMMY,
-                this.formatter.format(this.ui.expand(this.config.scoreboard.title)));
+                this.formatter.format(this.ui.render(this.config.scoreboard.title)));
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         if (this.config.scoreboard.hideNumbers) {
@@ -144,7 +144,7 @@ public final class ScoreboardService {
                 .replace("{COINS}", "0")
                 .replace("{LEVEL}", "0");
 
-        return this.formatter.format(this.ui.expand(text));
+        return this.formatter.format(this.ui.render(text));
     }
 
     private List<String> lines() {
