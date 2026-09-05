@@ -132,7 +132,7 @@ public class LobbyConfig extends OkaeriConfig {
         @Comment("bez tego linia z panelem liczylaby sie o te piksele za krotko.")
         @CustomKey("panel-widths")
         public Map<String, Integer> panelWidths = new LinkedHashMap<>(new LinkedHashMap<>(Map.of(
-                "sidebar", 176,
+                "sidebar", 184,
                 "bar", 220)));
     }
 
@@ -322,7 +322,7 @@ public class LobbyConfig extends OkaeriConfig {
         @Comment("Panel calej planszy jest rysowany tutaj i siega w dol pod ostatnia linie,")
         @Comment("wiec jest jeden zamiast kawalka na kazdy wiersz - i nie ma jak sie rozjechac.")
         public String title =
-                "{PANEL:sidebar}{SPACE:-164}<yellow><bold>LandMC.PL";
+                "{SPACE:-6}{PANEL:sidebar}{SPACE:-170}<yellow><bold>LandMC.PL";
 
         @Comment("")
         @Comment("Czy chowac liczby po prawej stronie linii.")
