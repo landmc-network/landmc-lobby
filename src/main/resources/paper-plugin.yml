@@ -22,3 +22,12 @@ dependencies:
       load: BEFORE
       required: false
       join-classpath: true
+
+    # Optional too, and declared for the same reason it has to be declared at all: Paper gives
+    # each plugin its own classloader, so a plugin that does not name another cannot see its
+    # classes even when it is installed and running. Without this line the tab list asked for
+    # LuckPerms, was told it was not there, and showed plain names on a server running it.
+    LuckPerms:
+      load: BEFORE
+      required: false
+      join-classpath: true

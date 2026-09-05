@@ -9,6 +9,10 @@
 # asks the proxy to open a menu, it does not draw one.
 landmc-menus = "1.3.0"
 
+# Ranks are LuckPerms groups. Optional at runtime: without it the tab list is just
+# names, which is what it was before there were ranks.
+luckperms = "5.5"
+
 landmc-platform = "1.4.0"
 
 # Paper 26.2 publishes Java 25 bytecode, which is why this project compiles with --release 25.
@@ -30,6 +34,7 @@ slf4j = "2.0.17"
 [libraries]
 paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper" }
 
+luckperms-api = { module = "net.luckperms:api", version.ref = "luckperms" }
 menus-api = { module = "pl.landmc:menus-api", version.ref = "landmc-menus" }
 platform-api = { module = "pl.landmc:platform-api", version.ref = "landmc-platform" }
 platform-common = { module = "pl.landmc:platform-common", version.ref = "landmc-platform" }

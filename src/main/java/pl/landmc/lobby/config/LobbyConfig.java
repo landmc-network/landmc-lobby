@@ -27,6 +27,9 @@ public class LobbyConfig extends OkaeriConfig {
     public ScoreboardSection scoreboard = new ScoreboardSection();
 
     @Comment("")
+    public TablistSection tablist = new TablistSection();
+
+    @Comment("")
     public WorldSection world = new WorldSection();
 
     @Comment("Baza danych profili lobby. H2 dziala bez zadnej konfiguracji.")
@@ -236,5 +239,34 @@ public class LobbyConfig extends OkaeriConfig {
                 "   ",
                 "<yellow><bold>Strona <white>serwera",
                 "<white>landmc.pl"));
+    }
+
+    /** How a name reads in the tab list. */
+    public static class TablistSection extends OkaeriConfig {
+
+        @Comment("Czy nick w tabie ma pokazywac prefiks rangi.")
+        public boolean enabled = true;
+
+        @Comment("")
+        @Comment("Format wpisu. Placeholdery: {PREFIX} - prefiks z LuckPermsa, {PLAYER} - nick.")
+        @Comment("Tak jak na starym LandMC: prefiks rangi, a za nim nick.")
+        public String format = "{PREFIX}{PLAYER}";
+
+        @Comment("")
+        @Comment("Naglowek nad lista. Pusta lista = bez naglowka.")
+        @Comment("Placeholdery: {PLAYER}, {SERVER}, {ONLINE}")
+        @Comment("Starego LandMC to nie mialo - dodane pozniej, na zyczenie.")
+        public List<String> header = new ArrayList<>(List.of(
+                "",
+                "<green><bold>LANDMC.PL",
+                ""));
+
+        @Comment("")
+        @Comment("Stopka pod lista. Pusta lista = bez stopki.")
+        public List<String> footer = new ArrayList<>(List.of(
+                "",
+                "<gray>Graczy online: <white>{ONLINE}",
+                "<gray>Sklep: <green>landmc.pl",
+                ""));
     }
 }
