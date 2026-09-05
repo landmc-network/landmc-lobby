@@ -147,7 +147,7 @@ public class LobbyConfig extends OkaeriConfig {
                 Map.entry("sidebar_head", 132),
                 Map.entry("sidebar_body", 132),
                 Map.entry("sidebar_foot", 132),
-                Map.entry("chip", 56),
+                Map.entry("chip", 52),
                 Map.entry("chip_wide", 176),
                 Map.entry("icon_time", 13),
                 Map.entry("icon_gems", 13),
@@ -192,13 +192,18 @@ public class LobbyConfig extends OkaeriConfig {
         @Comment("Placeholdery: {SERVER}, {ONLINE} - tylko takie, ktore sa wspolne dla")
         @Comment("wszystkich, bo paski sa jedne dla calego serwera.")
         public List<String> lines = new ArrayList<>(List.of(
+                // An empty row, and that is how the panel is moved down off the top edge of the
+                // screen. A boss bar cannot be placed - the client stacks them from the top,
+                // nineteen pixels apart - so the way to start lower is to give it a row above
+                // with nothing in it. Its own bar is invisible, so nothing shows.
+                " ",
                 // A row of tiles. Each one is drawn, the cursor is put back inside it for its
                 // contents, then moved to where the next one starts - which is what {AT:...}
                 // is for. Three of 56 with four pixels between them comes to 176, the width of
                 // the row below.
-                "{PANEL:chip}{AT:7}{PANEL:icon_gems}{AT:23}<aqua>{DIAMONDS}"
-                        + "{AT:60}{PANEL:chip}{AT:67}{PANEL:icon_coins}{AT:83}<gold>{COINS}"
-                        + "{AT:120}{PANEL:chip}{AT:127}{PANEL:icon_star}{AT:143}<yellow>{LEVEL}",
+                "{PANEL:chip}{AT:6}{PANEL:icon_gems}{AT:22}<aqua>{DIAMONDS}"
+                        + "{AT:62}{PANEL:chip}{AT:68}{PANEL:icon_coins}{AT:84}<gold>{COINS}"
+                        + "{AT:124}{PANEL:chip}{AT:130}{PANEL:icon_star}{AT:146}<yellow>{LEVEL}",
                 "{PANEL:chip_wide}{AT:8}<red>Rangi <dark_gray>("
                         + "<yellow><bold>VIP</bold><gray>, <light_purple><bold>SVIP</bold><gray>,"
                         + " <b><#FF5555>S<#FFAA00>Z<#FFFF55>E<#55FF55>F<#55FFFF>U<#00AAAA>N"
@@ -209,8 +214,10 @@ public class LobbyConfig extends OkaeriConfig {
         @Comment("Szerokosc, do ktorej dopychany jest kazdy wiersz paska.")
         @Comment("Tytul bossbara jest wysrodkowany, wiec rowna szerokosc to jedyne, co ustawia")
         @Comment("wiersze w pionie wzgledem siebie - inaczej kazdy centruje sie osobno.")
+        @Comment("Rowna sie szerokosci rzedu kafelkow: trzy po 52 z dziesiecioma przerwami")
+        @Comment("miedzy nimi, czyli tyle samo, co szeroki kafelek pod spodem.")
         @CustomKey("line-width")
-        public int lineWidth = 220;
+        public int lineWidth = 176;
 
         @Comment("")
         @Comment("Kolor paska: PINK, BLUE, RED, GREEN, YELLOW, PURPLE lub WHITE.")
