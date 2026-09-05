@@ -46,6 +46,10 @@ public class LobbyConfig extends OkaeriConfig {
     public PortalSection portal = new PortalSection();
 
     @Comment("")
+    @CustomKey("launch-pads")
+    public LaunchPadSection launchPads = new LaunchPadSection();
+
+    @Comment("")
     public WorldSection world = new WorldSection();
 
     @Comment("Baza danych profili lobby. H2 dziala bez zadnej konfiguracji.")
@@ -340,6 +344,33 @@ public class LobbyConfig extends OkaeriConfig {
         @Comment("")
         @Comment("Ktore menu. SERVERS to wybor trybu, tak jak /serwery.")
         public String menu = "SERVERS";
+    }
+
+    /**
+     * Plytki, ktore wyrzucaja gracza w powietrze.
+     *
+     * <p>Stary serwer mial jedna, kamienna, wpisana w kod. Lista materialow zamiast jednego,
+     * bo to dekoracja mapy - budowniczy chce miec do wyboru cos, co pasuje do podlogi.
+     */
+    public static class LaunchPadSection extends OkaeriConfig {
+
+        @Comment("Czy plytki naciskowe wyrzucaja gracza.")
+        public boolean enabled = true;
+
+        @Comment("")
+        @Comment("Materialy dzialajace jak wyrzutnia.")
+        public List<String> materials =
+                new ArrayList<>(List.of("STONE_PRESSURE_PLATE"));
+
+        @Comment("")
+        @Comment("Sila do przodu i w gore. Stary serwer mial poltora w obu.")
+        public double power = 1.5D;
+
+        public double lift = 1.5D;
+
+        @Comment("")
+        @Comment("Dzwiek wyrzutu. Pusty = bez dzwieku.")
+        public String sound = "ENTITY_ENDER_DRAGON_SHOOT";
     }
 
     public static class LobbySection extends OkaeriConfig {

@@ -32,7 +32,7 @@ import pl.landmc.lobby.command.SetSpawnCommand;
 import pl.landmc.lobby.command.SpawnCommand;
 import pl.landmc.lobby.config.LobbyConfig;
 import pl.landmc.lobby.listener.NpcListener;
-import pl.landmc.lobby.listener.PortalListener;
+import pl.landmc.lobby.listener.SpawnBlockListener;
 import pl.landmc.lobby.listener.ProtectionListener;
 import pl.landmc.lobby.menu.MenuChannel;
 import pl.landmc.lobby.messaging.ServerCountsMessage;
@@ -202,9 +202,11 @@ public final class LobbyBootstrap {
         this.plugin.getServer().getPluginManager()
                 .registerEvents(new ProtectionListener(this.config), this.plugin);
 
-        if (this.config.portal.enabled) {
+        // The portal and the launch pads share a listener, because they share the expensive
+        // part: noticing that somebody changed block at all.
+        if (this.config.portal.enabled || this.config.launchPads.enabled) {
             this.plugin.getServer().getPluginManager().registerEvents(
-                    new PortalListener(this.plugin, menuChannel, this.config), this.plugin);
+                    new SpawnBlockListener(this.plugin, menuChannel, this.config), this.plugin);
         }
 
         this.startScoreboards(formatter, balances);
