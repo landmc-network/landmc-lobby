@@ -322,7 +322,7 @@ public class LobbyConfig extends OkaeriConfig {
         @Comment("Panel calej planszy jest rysowany tutaj i siega w dol pod ostatnia linie,")
         @Comment("wiec jest jeden zamiast kawalka na kazdy wiersz - i nie ma jak sie rozjechac.")
         public String title =
-                "{PANEL:sidebar}{SPACE:-118}<yellow><bold>LandMC.PL";
+                "{PANEL:sidebar}{SPACE:-164}<yellow><bold>LandMC.PL";
 
         @Comment("")
         @Comment("Czy chowac liczby po prawej stronie linii.")
@@ -340,14 +340,14 @@ public class LobbyConfig extends OkaeriConfig {
         @Comment("{COINS} i {LEVEL} pokazuja na razie zero - sieć nie ma jeszcze drugiej")
         @Comment("waluty ani poziomow. Zapala sie same, kiedy te systemy powstana.")
         public List<String> lines = new ArrayList<>(List.of(
-                "{SPACE:-168}<green><bold>Podserwer",
-                "{SPACE:-168}<white>{SERVER}",
-                "{SPACE:-168} ",
-                "{SPACE:-168}<light_purple><bold>Statystyki <white>gracza",
-                "{SPACE:-168}<light_purple>• <white>Monety: <gold>{COINS}",
-                "{SPACE:-168}<light_purple>• <white>Diamenty: <aqua>{DIAMONDS}❖",
-                "{SPACE:-168}<light_purple>• <white>Poziom: <gold>{LEVEL}✰",
-                "{SPACE:-168} ",
-                "{SPACE:-168}<yellow>landmc.pl"));
+                "{SPACE:8}<green><bold>Podserwer",
+                "{SPACE:8}<white>{SERVER}",
+                "{SPACE:8} ",
+                "{SPACE:8}<light_purple><bold>Statystyki <white>gracza",
+                "{SPACE:8}<light_purple>• <white>Monety: <gold>{COINS}",
+                "{SPACE:8}<light_purple>• <white>Diamenty: <aqua>{DIAMONDS}❖",
+                "{SPACE:8}<light_purple>• <white>Poziom: <gold>{LEVEL}✰",
+                "{SPACE:8} ",
+                "{SPACE:8}<yellow>landmc.pl"));
     }
 }
