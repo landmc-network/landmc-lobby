@@ -122,7 +122,7 @@ public final class LobbyBootstrap {
         this.plugin.getServer().getPluginManager()
                 .registerEvents(new ProfileListener(this.profiles), this.plugin);
         this.plugin.getServer().getPluginManager()
-                .registerEvents(new SpawnListener(spawn), this.plugin);
+                .registerEvents(new SpawnListener(spawn, this.plugin), this.plugin);
         this.plugin.getServer().getPluginManager()
                 .registerEvents(new UnknownCommandListener(platformNotices), this.plugin);
 

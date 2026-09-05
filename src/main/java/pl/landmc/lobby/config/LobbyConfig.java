@@ -47,6 +47,12 @@ public class LobbyConfig extends OkaeriConfig {
         @CustomKey("teleport-on-join")
         public boolean teleportOnJoin = true;
 
+        @Comment("")
+        @Comment("Animacja totemu po wejsciu na lobby - czyli zaraz po zalogowaniu,")
+        @Comment("bo niezalogowany gracz nigdy tu nie trafia. Tak bylo na starym LandMC.")
+        @CustomKey("totem-on-join")
+        public boolean totemOnJoin = true;
+
         @Comment("Ustawiany komenda /setspawn. Pusty world = spawn nie jest jeszcze ustawiony.")
         public String world = "";
 

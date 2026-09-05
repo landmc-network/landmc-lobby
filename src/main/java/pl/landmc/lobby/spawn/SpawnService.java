@@ -64,6 +64,11 @@ public final class SpawnService {
         return this.config.spawn.teleportOnJoin;
     }
 
+    /** Whether arriving on the lobby plays the totem animation. */
+    public boolean totemOnJoin() {
+        return this.config.spawn.totemOnJoin;
+    }
+
     /** Stores a new spawn and writes it to disk. */
     public void setSpawn(Location location) {
         Objects.requireNonNull(location, "location");
