@@ -516,7 +516,9 @@ public class LobbyConfig extends OkaeriConfig {
     public static class BossBarSection extends OkaeriConfig {
 
         @Comment("Pasek u gory ekranu, reklamujacy rangi - tak jak na starym LandMC.")
-        public boolean enabled = true;
+        @Comment("Wylaczony: te same liczby sa na tablicy po prawej, a pasek zabiera")
+        @Comment("gorna czesc ekranu kazdemu, kto tylko przechodzi przez lobby.")
+        public boolean enabled = false;
 
         @Comment("")
         @Comment("Wiersze paska, od gory. Kazdy to osobny bossbar - klient sam ustawia je")
