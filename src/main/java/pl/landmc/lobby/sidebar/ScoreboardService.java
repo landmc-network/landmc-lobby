@@ -48,7 +48,6 @@ public final class ScoreboardService {
     private final BalanceTracker balances;
     private final ProfileService profiles;
     private final ComponentFormatter formatter;
-    private final UiText ui;
 
     /** Which configured lines can change, so a refresh rewrites only those. */
     private final List<Integer> dynamic;
@@ -69,7 +68,6 @@ public final class ScoreboardService {
         this.balances = Objects.requireNonNull(balances, "balances");
         this.profiles = Objects.requireNonNull(profiles, "profiles");
         this.formatter = Objects.requireNonNull(formatter, "formatter");
-        this.ui = new UiText(config.ui, formatter);
         this.dynamic = dynamicLines(config.scoreboard.lines);
     }
 
@@ -85,7 +83,7 @@ public final class ScoreboardService {
         Objective objective = board.registerNewObjective(
                 "landmc",
                 Criteria.DUMMY,
-                this.formatter.format(this.ui.render(this.config.scoreboard.title)));
+                this.formatter.format(this.config.scoreboard.title));
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         if (this.config.scoreboard.hideNumbers) {
@@ -151,7 +149,7 @@ public final class ScoreboardService {
                         this.balances.coinsOf(player.getUniqueId())))
                 .replace("{LEVEL}", Integer.toString(this.levelOf(player)));
 
-        return this.formatter.format(this.ui.render(text));
+        return this.formatter.format(text);
     }
 
     private List<String> lines() {

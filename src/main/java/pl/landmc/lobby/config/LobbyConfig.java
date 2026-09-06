@@ -27,9 +27,6 @@ public class LobbyConfig extends OkaeriConfig {
     public ScoreboardSection scoreboard = new ScoreboardSection();
 
     @Comment("")
-    public UiSection ui = new UiSection();
-
-    @Comment("")
     public FlySection fly = new FlySection();
 
     @Comment("")
@@ -494,65 +491,6 @@ public class LobbyConfig extends OkaeriConfig {
      * scoreboard's own lines, because that is the layout and it belongs next to the text it
      * arranges.
      */
-    public static class UiSection extends OkaeriConfig {
-
-        @Comment("Czy scoreboard rysuje panele z resourcepacka.")
-        @Comment("Wylaczone = tokeny {PANEL:...} i {SPACE:...} sa po prostu usuwane,")
-        @Comment("wiec plansza bez paczki wyglada zwyczajnie zamiast pokazywac puste kwadraty.")
-        public boolean enabled = true;
-
-        @Comment("")
-        @Comment("Fonty z paczki. Pierwszy rysuje panele, drugi tylko przesuwa kursor.")
-        public String font = "landmc:ui";
-
-        @CustomKey("space-font")
-        public String spaceFont = "landmc:space";
-
-        @Comment("")
-        @Comment("Szerokosc, do ktorej dopychana jest kazda linia planszy, w pikselach.")
-        @Comment("Bez tego kazda linia jest wyrownywana do prawej osobno i plansza rozjezdza")
-        @Comment("sie przy kazdej zmianie liczby. 0 wylacza dopychanie.")
-        @CustomKey("line-width")
-        public int lineWidth = 124;
-
-        @Comment("")
-        @Comment("Panele i ich znaki. Te same, ktore wypisuje scripts/build-ui-font.py")
-        @Comment("w landmc-deploy - przy dodaniu nowego panelu przepisz stamtad kolejny.")
-        public Map<String, String> panels = new LinkedHashMap<>(new LinkedHashMap<>(Map.ofEntries(
-                Map.entry("sidebar_head", "U+E000"),
-                Map.entry("sidebar_body", "U+E001"),
-                Map.entry("sidebar_foot", "U+E002"),
-                Map.entry("chip", "U+E003"),
-                Map.entry("chip_wide", "U+E004"),
-                Map.entry("icon_time", "U+E100"),
-                Map.entry("icon_gems", "U+E101"),
-                Map.entry("icon_coins", "U+E102"),
-                Map.entry("icon_star", "U+E103"),
-                Map.entry("icon_generators", "U+E104"),
-                Map.entry("icon_boost", "U+E105"),
-                Map.entry("icon_plus", "U+E106"),
-                Map.entry("icon_minus", "U+E107"))));
-
-        @Comment("")
-        @Comment("Szerokosci tych paneli. Panel przesuwa kursor o swoja szerokosc, wiec")
-        @Comment("bez tego linia z panelem liczylaby sie o te piksele za krotko.")
-        @CustomKey("panel-widths")
-        @Comment("Ikony maja 12 pikseli obrazka plus piksel odstepu, tak jak litera.")
-        public Map<String, Integer> panelWidths = new LinkedHashMap<>(new LinkedHashMap<>(Map.ofEntries(
-                Map.entry("sidebar_head", 132),
-                Map.entry("sidebar_body", 132),
-                Map.entry("sidebar_foot", 132),
-                Map.entry("chip", 52),
-                Map.entry("chip_wide", 180),
-                Map.entry("icon_time", 13),
-                Map.entry("icon_gems", 13),
-                Map.entry("icon_coins", 13),
-                Map.entry("icon_star", 13),
-                Map.entry("icon_generators", 13),
-                Map.entry("icon_boost", 13),
-                Map.entry("icon_plus", 13),
-                Map.entry("icon_minus", 13))));
-    }
 
     public static class FlySection extends OkaeriConfig {
 
@@ -581,53 +519,21 @@ public class LobbyConfig extends OkaeriConfig {
         public boolean enabled = true;
 
         @Comment("")
-        @Comment("Wiersze paska, od gory. Kazdy to osobny bossbar - tytul bossbara to jedna")
-        @Comment("linia, wiec panel na kilka wierszy to kilka paskow, a klient sam ustawia je")
-        @Comment("jeden pod drugim. Panel rysowany jest na pierwszym i siega w dol po resztę.")
-        @Comment("Placeholdery: {SERVER}, {ONLINE} - tylko takie, ktore sa wspolne dla")
-        @Comment("wszystkich, bo paski sa jedne dla calego serwera.")
+        @Comment("Wiersze paska, od gory. Kazdy to osobny bossbar - klient sam ustawia je")
+        @Comment("jeden pod drugim.")
+        @Comment("Placeholdery: {SERVER}, {ONLINE}, {DIAMONDS}, {COINS}, {LEVEL}")
         public List<String> lines = new ArrayList<>(List.of(
-                // An empty row, and that is how the panel is moved down off the top edge of the
-                // screen. A boss bar cannot be placed - the client stacks them from the top,
-                // nineteen pixels apart - so the way to start lower is to give it a row above
-                // with nothing in it. Its own bar is invisible, so nothing shows.
-                " ",
-                // A row of tiles. Each one is drawn, the cursor is put back inside it for its
-                // contents, then moved to where the next one starts - which is what {AT:...}
-                // is for. Three of 56 with four pixels between them comes to 176, the width of
-                // the row below.
-                // Every icon is wrapped in <white>. A bitmap glyph is multiplied by the colour
-                // in force where it sits, so an icon that inherits the colour of the value
-                // before it comes out tinted - the coins took the diamonds' aqua and the star
-                // took the coins' gold. White is the one colour that leaves a texture alone.
-                "{PANEL:chip}{AT:6}<white>{PANEL:icon_gems}{AT:22}<aqua>{DIAMONDS}"
-                        + "{AT:64}{PANEL:chip}{AT:70}<white>{PANEL:icon_coins}"
-                        + "{AT:86}<gold>{COINS}"
-                        + "{AT:128}{PANEL:chip}{AT:134}<white>{PANEL:icon_star}"
-                        + "{AT:150}<yellow>{LEVEL}",
-                // The old server wrapped these names in "Rangi (...)". The wrapper is what was
-                // dropped to bring the tile down to 180: the names still say what they are and
-                // the arrow still says what to do about it.
-                "{PANEL:chip_wide}{AT:8}"
-                        + "<yellow><bold>VIP</bold><gray>, <light_purple><bold>SVIP</bold><gray>,"
+                "<aqua>Diamenty: <white>{DIAMONDS}"
+                        + " <dark_gray>| <gold>Monety: <white>{COINS}"
+                        + " <dark_gray>| <yellow>Poziom: <white>{LEVEL}",
+                "<yellow><bold>VIP</bold><gray>, <light_purple><bold>SVIP</bold><gray>,"
                         + " <b><#FF5555>S<#FFAA00>Z<#FFFF55>E<#55FF55>F<#55FFFF>U<#00AAAA>N"
                         + "<#FF55FF>C<#FF5555>I<#FFAA00>O</b>"
                         + " <red>➤ <white><underlined>/rangi"));
 
         @Comment("")
-        @Comment("Szerokosc, do ktorej dopychany jest kazdy wiersz paska.")
-        @Comment("Tytul bossbara jest wysrodkowany, wiec rowna szerokosc to jedyne, co ustawia")
-        @Comment("wiersze w pionie wzgledem siebie - inaczej kazdy centruje sie osobno.")
-        @Comment("Rowna sie szerokosci rzedu kafelkow: trzy po 52 z dwunastoma przerwami")
-        @Comment("miedzy nimi, czyli tyle samo, co szeroki kafelek pod spodem.")
-        @CustomKey("line-width")
-        public int lineWidth = 180;
-
-        @Comment("")
         @Comment("Kolor paska: PINK, BLUE, RED, GREEN, YELLOW, PURPLE lub WHITE.")
-        @Comment("Musi byc ten, ktorego tekstury zeruje paczka - inaczej pod napisami zostana")
-        @Comment("widoczne paski. Zerowany jest jeden kolor, zeby zwykly boss dalej mial swoj.")
-        public String colour = "BLUE";
+        public String colour = "GREEN";
 
         @Comment("Styl: PROGRESS (jednolity, jak w oryginale) albo NOTCHED_6/10/12/20.")
         public String style = "PROGRESS";
@@ -781,8 +687,7 @@ public class LobbyConfig extends OkaeriConfig {
         @Comment("Tytul planszy. Rysowany nad pierwsza linia, wiec panel naglowka jest tutaj.")
         @Comment("Pasek z nazwa serwera. Tekst wysrodkowany na panelu: -90 to jego szerokosc")
         @Comment("minus polowa tego, co zostaje po odjeciu napisu.")
-        public String title =
-                "{SPACE:-6}{PANEL:sidebar_head}{SPACE:-90}<yellow><bold>LandMC.PL";
+        public String title = "<yellow><bold>LandMC.PL";
 
         @Comment("")
         @Comment("Czy chowac liczby po prawej stronie linii.")
@@ -793,24 +698,17 @@ public class LobbyConfig extends OkaeriConfig {
 
         @Comment("")
         @Comment("Linie od gory. Maksymalnie 16.")
-        @Comment("{PANEL:nazwa} rysuje panel z paczki, {SPACE:n} przesuwa o n pikseli.")
-        @Comment("Panel nie zajmuje miejsca: rysuje sie, a nastepny {SPACE:-...} cofa kursor")
-        @Comment("na jego poczatek, wiec tekst laduje na nim, a nie za nim.")
         @Comment("Placeholdery: {PLAYER}, {SERVER}, {ONLINE}, {DIAMONDS}, {COINS}, {LEVEL}")
-        @Comment("{COINS} i {LEVEL} pokazuja na razie zero - sieć nie ma jeszcze drugiej")
-        @Comment("waluty ani poziomow. Zapala sie same, kiedy te systemy powstana.")
         public List<String> lines = new ArrayList<>(List.of(
-                // Empty, and that is the gap between the name bar and the body.
                 " ",
-                "{SPACE:-6}{PANEL:sidebar_body}{SPACE:-118}<green><bold>Podserwer",
-                "{SPACE:8}<white>{SERVER}",
-                "{SPACE:8} ",
-                "{SPACE:8}<light_purple><bold>Statystyki <white>gracza",
-                "{SPACE:8}<light_purple>• <white>Monety: <gold>{COINS}",
-                "{SPACE:8}<light_purple>• <white>Diamenty: <aqua>{DIAMONDS}❖",
-                "{SPACE:8}<light_purple>• <white>Poziom: <gold>{LEVEL}✰",
-                // And this one is the gap between the body and the address.
-                " ",
-                "{SPACE:-6}{PANEL:sidebar_foot}{SPACE:-82}<yellow>landmc.pl"));
+                "<green><bold>Podserwer",
+                "<gray>» <white>{SERVER}",
+                "  ",
+                "<light_purple><bold>Statystyki",
+                "<gray>» <white>Monety: <gold>{COINS}",
+                "<gray>» <white>Diamenty: <aqua>{DIAMONDS}",
+                "<gray>» <white>Poziom: <yellow>{LEVEL}",
+                "   ",
+                "<yellow>landmc.pl"));
     }
 }

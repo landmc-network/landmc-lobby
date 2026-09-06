@@ -53,7 +53,6 @@ import pl.landmc.lobby.messaging.PingMessage;
 import pl.landmc.lobby.messaging.PongMessage;
 import pl.landmc.lobby.profile.ProfileRepository;
 import pl.landmc.lobby.profile.ProfileService;
-import pl.landmc.lobby.sidebar.UiText;
 import pl.landmc.lobby.spawn.SpawnService;
 import pl.landmc.lobby.world.WorldSetup;
 import pl.landmc.lobby.world.WorldSetupListener;
@@ -142,7 +141,7 @@ public final class LobbyBootstrap {
         // is registered before the board is started. The board is handed the same tracker.
         BalanceTracker balances = new BalanceTracker(this.plugin, this.logger);
         this.bossBar = new BossBarService(
-                this.config, formatter, new UiText(this.config.ui, formatter), balances,
+                this.config, formatter, balances,
                 this.profiles);
 
         // A lobby with flight switched off does not answer /fly at all, rather than answering

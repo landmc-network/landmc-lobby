@@ -14,7 +14,6 @@ import pl.landmc.lobby.config.LobbyConfig;
 import pl.landmc.lobby.profile.ProfileService;
 import pl.landmc.lobby.sidebar.LobbyLevel;
 import pl.landmc.lobby.sidebar.BalanceTracker;
-import pl.landmc.lobby.sidebar.UiText;
 import pl.landmc.platform.component.ComponentFormatter;
 
 /**
@@ -37,7 +36,6 @@ public final class BossBarService {
 
     private final LobbyConfig config;
     private final ComponentFormatter formatter;
-    private final UiText ui;
     private final BalanceTracker balances;
     private final ProfileService profiles;
 
@@ -50,13 +48,11 @@ public final class BossBarService {
     public BossBarService(
             LobbyConfig config,
             ComponentFormatter formatter,
-            UiText ui,
             BalanceTracker balances,
             ProfileService profiles) {
 
         this.config = Objects.requireNonNull(config, "config");
         this.formatter = Objects.requireNonNull(formatter, "formatter");
-        this.ui = Objects.requireNonNull(ui, "ui");
         this.balances = Objects.requireNonNull(balances, "balances");
         this.profiles = Objects.requireNonNull(profiles, "profiles");
     }
@@ -141,13 +137,13 @@ public final class BossBarService {
                 .replace("{PLAYER}", player.getName())
                 .replace("{SERVER}", this.config.lobby.serverId)
                 .replace("{ONLINE}", Integer.toString(Bukkit.getOnlinePlayers().size()))
-                .replace("{DIAMONDS}", Long.toString(this.balances.balanceOf(player.getUniqueId())))
-                // Neither has a system behind it yet, and the board says the same about them.
-                .replace("{COINS}", Long.toString(
-                        this.balances.coinsOf(player.getUniqueId())))
+                .replace("{DIAMONDS}",
+                        Long.toString(this.balances.balanceOf(player.getUniqueId())))
+                .replace("{COINS}",
+                        Long.toString(this.balances.coinsOf(player.getUniqueId())))
                 .replace("{LEVEL}", Integer.toString(this.levelOf(player)));
 
-        return this.ui.render(text, this.config.bossBar.lineWidth);
+        return text;
     }
 
     /** The configured colour, or the old server's green when it names one that does not exist. */
